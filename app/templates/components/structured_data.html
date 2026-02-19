@@ -1,0 +1,76 @@
+{# JSON-LD Structured Data - included in base.html #}
+
+{# WebSite schema (every page) #}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "{{ site_name }}",
+    "url": "{{ site_url }}",
+    "description": "Blog o niezależności finansowej, inwestowaniu i oszczędzaniu. Twoja droga do FIRE.",
+    "inLanguage": "pl-PL",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ site_url }}/blog?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+
+{# BlogPosting schema (article detail only) #}
+{% if article_jsonld %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "{{ article_jsonld.title }}",
+    "description": "{{ article_jsonld.excerpt or '' }}",
+    "url": "{{ site_url }}/{{ article_jsonld.slug }}",
+    "datePublished": "{{ (article_jsonld.published_at or article_jsonld.created_at).isoformat() }}",
+    "dateModified": "{{ article_jsonld.updated_at.isoformat() }}",
+    "author": {
+        "@type": "Person",
+        "name": "Projekt FIRE",
+        "url": "{{ site_url }}/o-mnie"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ site_name }}",
+        "url": "{{ site_url }}"
+    },
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ site_url }}/{{ article_jsonld.slug }}"
+    }
+    {% if article_jsonld.featured_image %},
+    "image": "{{ article_jsonld.featured_image }}"
+    {% endif %}
+    {% if article_jsonld.category %},
+    "articleSection": "{{ article_jsonld.category.name }}"
+    {% endif %}
+    {% if article_jsonld.tags %},
+    "keywords": "{{ article_jsonld.tags | map(attribute='name') | join(', ') }}"
+    {% endif %}
+}
+</script>
+{% endif %}
+
+{# BreadcrumbList schema #}
+{% if breadcrumbs_jsonld %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {% for crumb in breadcrumbs_jsonld %}
+        {
+            "@type": "ListItem",
+            "position": {{ loop.index }},
+            "name": "{{ crumb.name }}",
+            "item": "{{ crumb.url }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endif %}

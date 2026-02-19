@@ -11,11 +11,13 @@ from app.models.article import Article, ArticleStatus, article_tag
 from app.models.category import Category
 from app.models.tag import Tag
 from app.services.article_service import get_all_categories, get_all_tags, get_articles
+from app.config import settings
 from app.templating import templates
 
 router = APIRouter(tags=["blog"])
 
 PER_PAGE = 10
+_BASE = settings.SITE_URL
 
 
 async def _sidebar_data(db: AsyncSession) -> dict:
@@ -64,6 +66,10 @@ async def _render_blog_list(request: Request, db: AsyncSession, page: int):
         "current_page": page,
         "total_pages": total_pages,
         "base_url": "/blog",
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": _BASE},
+            {"name": "Blog", "url": f"{_BASE}/blog"},
+        ],
         **sidebar,
     })
 
@@ -123,6 +129,11 @@ async def _render_category(request: Request, db: AsyncSession, slug: str, page: 
         "current_page": page,
         "total_pages": total_pages,
         "base_url": f"/kategoria/{slug}",
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": _BASE},
+            {"name": "Blog", "url": f"{_BASE}/blog"},
+            {"name": category.name, "url": f"{_BASE}/kategoria/{slug}"},
+        ],
     })
 
 
@@ -184,6 +195,11 @@ async def _render_tag(request: Request, db: AsyncSession, slug: str, page: int):
         "current_page": page,
         "total_pages": total_pages,
         "base_url": f"/tag/{slug}",
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": _BASE},
+            {"name": "Blog", "url": f"{_BASE}/blog"},
+            {"name": f"#{tag.name}", "url": f"{_BASE}/tag/{slug}"},
+        ],
     })
 
 
@@ -205,8 +221,18 @@ async def article_detail(
     if not article:
         return templates.TemplateResponse("pages/404.html", {"request": request}, status_code=404)
 
+    breadcrumbs = [
+        {"name": "Strona główna", "url": _BASE},
+        {"name": "Blog", "url": f"{_BASE}/blog"},
+    ]
+    if article.category:
+        breadcrumbs.append({"name": article.category.name, "url": f"{_BASE}/kategoria/{article.category.slug}"})
+    breadcrumbs.append({"name": article.title, "url": f"{_BASE}/{article.slug}"})
+
     return templates.TemplateResponse("blog/detail.html", {
         "request": request,
         "active_nav": "blog",
         "article": article,
+        "article_jsonld": article,
+        "breadcrumbs_jsonld": breadcrumbs,
     })

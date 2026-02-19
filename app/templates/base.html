@@ -47,6 +47,10 @@
     </script>
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
 
+    {% block structured_data %}
+    {% include "components/structured_data.html" %}
+    {% endblock %}
+
     {% block head %}{% endblock %}
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">

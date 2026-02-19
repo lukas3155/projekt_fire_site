@@ -30,11 +30,13 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 from app.routers.panel import RequireLoginException, router as panel_router  # noqa: E402
 from app.routers.pages import router as pages_router  # noqa: E402
 from app.routers.htmx import router as htmx_router  # noqa: E402
+from app.routers.seo import router as seo_router  # noqa: E402
 from app.routers.blog import router as blog_router  # noqa: E402
 
 app.include_router(panel_router)
 app.include_router(pages_router)
 app.include_router(htmx_router)
+app.include_router(seo_router)
 app.include_router(blog_router)  # Must be last — contains catch-all /{slug}
 
 

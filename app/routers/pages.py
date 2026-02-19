@@ -45,6 +45,10 @@ async def start_here(
         "request": request,
         "active_nav": "start",
         "articles": articles,
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": settings.SITE_URL},
+            {"name": "Tutaj zacznij", "url": f"{settings.SITE_URL}/tutaj-zacznij"},
+        ],
     })
 
 
@@ -63,6 +67,10 @@ async def about(
         "request": request,
         "active_nav": "about",
         "page": page,
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": settings.SITE_URL},
+            {"name": "O mnie", "url": f"{settings.SITE_URL}/o-mnie"},
+        ],
     })
 
 
@@ -72,6 +80,10 @@ async def contact_page(request: Request):
         "request": request,
         "active_nav": "contact",
         "contact_email": settings.CONTACT_EMAIL,
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": settings.SITE_URL},
+            {"name": "Kontakt", "url": f"{settings.SITE_URL}/kontakt"},
+        ],
     })
 
 

@@ -1,0 +1,22 @@
+{% if query %}
+<div class="mt-4 space-y-3">
+    {% if articles %}
+    {% for article in articles %}
+    <a href="/{{ article.slug }}" class="block bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-3 mb-1">
+            {% if article.category %}
+            <span class="text-xs text-fire-700 bg-fire-50 px-2 py-0.5 rounded-full">{{ article.category.name }}</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">{{ (article.published_at or article.created_at).strftime('%d.%m.%Y') }}</span>
+        </div>
+        <h3 class="font-medium text-gray-800">{{ article.title }}</h3>
+        {% if article.excerpt %}
+        <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ article.excerpt }}</p>
+        {% endif %}
+    </a>
+    {% endfor %}
+    {% else %}
+    <p class="text-sm text-gray-500 py-4 text-center">Brak wyników dla "{{ query }}"</p>
+    {% endif %}
+</div>
+{% endif %}

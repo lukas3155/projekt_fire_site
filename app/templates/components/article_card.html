@@ -1,0 +1,46 @@
+<article class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+    {% if article.featured_image %}
+    <a href="/{{ article.slug }}">
+        <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="w-full h-48 object-cover" loading="lazy">
+    </a>
+    {% endif %}
+    <div class="p-6">
+        <div class="flex items-center gap-3 mb-3">
+            {% if article.category %}
+            <a href="/kategoria/{{ article.category.slug }}"
+               class="text-xs font-medium text-fire-700 bg-fire-50 px-2 py-1 rounded-full hover:bg-fire-100 transition-colors">
+                {{ article.category.name }}
+            </a>
+            {% endif %}
+            <time datetime="{{ article.published_at.isoformat() if article.published_at else article.created_at.isoformat() }}"
+                  class="text-xs text-gray-400">
+                {{ (article.published_at or article.created_at).strftime('%d.%m.%Y') }}
+            </time>
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-800 mb-2 leading-tight">
+            <a href="/{{ article.slug }}" class="hover:text-fire-700 transition-colors">
+                {{ article.title }}
+            </a>
+        </h2>
+
+        {% if article.excerpt %}
+        <p class="text-gray-600 text-sm leading-relaxed mb-4">{{ article.excerpt }}</p>
+        {% endif %}
+
+        <div class="flex items-center justify-between">
+            {% if article.tags %}
+            <div class="flex flex-wrap gap-1">
+                {% for tag in article.tags[:3] %}
+                <a href="/tag/{{ tag.slug }}" class="text-xs text-gray-400 hover:text-fire-600">#{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div></div>
+            {% endif %}
+            <a href="/{{ article.slug }}" class="text-sm font-medium text-fire-600 hover:text-fire-800 transition-colors">
+                Czytaj dalej &rarr;
+            </a>
+        </div>
+    </div>
+</article>

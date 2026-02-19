@@ -1,0 +1,55 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Komentarze{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Komentarze</h2>
+    <span class="text-sm text-gray-500">{{ comments | length }} komentarzy</span>
+</div>
+
+{% if comments %}
+<div class="space-y-4">
+    {% for comment in comments %}
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-medium text-gray-800">{{ comment.nickname }}</span>
+                    <span class="text-xs text-gray-400">{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    <span class="text-xs text-gray-400">IP: {{ comment.ip_address or '—' }}</span>
+                    {% if not comment.is_approved %}
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Ukryty</span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-700 text-sm mb-2">{{ comment.content }}</p>
+                <a href="/panel/articles/{{ comment.article_id }}/edit"
+                   class="text-xs text-blue-600 hover:text-blue-800">
+                    → {{ comment.article.title if comment.article else 'Artykuł #' + comment.article_id|string }}
+                </a>
+            </div>
+            <div class="flex gap-2 ml-4">
+                {% if not comment.is_approved %}
+                <form method="post" action="/panel/comments/{{ comment.id }}/approve">
+                    <button type="submit" class="text-sm text-green-600 hover:text-green-800 px-2 py-1">Zatwierdź</button>
+                </form>
+                {% else %}
+                <form method="post" action="/panel/comments/{{ comment.id }}/hide">
+                    <button type="submit" class="text-sm text-yellow-600 hover:text-yellow-800 px-2 py-1">Ukryj</button>
+                </form>
+                {% endif %}
+                <form method="post" action="/panel/comments/{{ comment.id }}/delete"
+                      onsubmit="return confirm('Usunąć komentarz?')">
+                    <button type="submit" class="text-sm text-red-600 hover:text-red-800 px-2 py-1">Usuń</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-lg shadow-sm p-8 text-center">
+    <p class="text-gray-500">Brak komentarzy.</p>
+</div>
+{% endif %}
+{% endblock %}

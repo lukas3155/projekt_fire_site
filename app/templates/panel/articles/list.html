@@ -1,0 +1,66 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Artykuły{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Artykuły</h2>
+    <a href="/panel/articles/new"
+       class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium">
+        + Nowy artykuł
+    </a>
+</div>
+
+{% if articles %}
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-gray-50 border-b">
+            <tr>
+                <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Tytuł</th>
+                <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Kategoria</th>
+                <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Data</th>
+                <th class="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Akcje</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for article in articles %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                    <a href="/panel/articles/{{ article.id }}/edit" class="text-gray-800 hover:text-green-600 font-medium">
+                        {{ article.title }}
+                    </a>
+                    <p class="text-xs text-gray-400 mt-0.5">/{{ article.slug }}</p>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">
+                    {{ article.category.name if article.category else '—' }}
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-xs px-2 py-1 rounded-full
+                        {% if article.status.value == 'published' %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                        {{ article.status.value }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    {{ article.created_at.strftime('%d.%m.%Y %H:%M') }}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <a href="/panel/articles/{{ article.id }}/edit"
+                       class="text-sm text-blue-600 hover:text-blue-800 mr-3">Edytuj</a>
+                    <form method="post" action="/panel/articles/{{ article.id }}/delete" class="inline"
+                          onsubmit="return confirm('Na pewno usunąć artykuł?')">
+                        <button type="submit" class="text-sm text-red-600 hover:text-red-800">Usuń</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white rounded-lg shadow-sm p-8 text-center">
+    <p class="text-gray-500 mb-4">Brak artykułów.</p>
+    <a href="/panel/articles/new" class="text-green-600 hover:underline">Utwórz pierwszy artykuł</a>
+</div>
+{% endif %}
+{% endblock %}

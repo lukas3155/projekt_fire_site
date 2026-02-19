@@ -1,0 +1,50 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <p class="text-sm text-gray-500">Artykuły</p>
+        <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.articles }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ stats.published }} opublikowanych, {{ stats.drafts }} szkiców</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <p class="text-sm text-gray-500">Komentarze</p>
+        <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.comments }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <p class="text-sm text-gray-500">Kategorie</p>
+        <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.categories }}</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Ostatnie artykuły</h3>
+        <a href="/panel/articles/new" class="text-sm text-green-600 hover:text-green-800">+ Nowy artykuł</a>
+    </div>
+    {% if recent_articles %}
+    <ul class="divide-y divide-gray-100">
+        {% for article in recent_articles %}
+        <li class="py-3 flex items-center justify-between">
+            <div>
+                <a href="/panel/articles/{{ article.id }}/edit" class="text-gray-800 hover:text-green-600 font-medium">
+                    {{ article.title }}
+                </a>
+                <span class="ml-2 text-xs px-2 py-0.5 rounded-full
+                    {% if article.status.value == 'published' %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                    {{ article.status.value }}
+                </span>
+            </div>
+            <span class="text-sm text-gray-400">{{ article.created_at.strftime('%d.%m.%Y') }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-gray-500">Brak artykułów. <a href="/panel/articles/new" class="text-green-600 hover:underline">Utwórz pierwszy!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

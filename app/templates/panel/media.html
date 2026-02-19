@@ -12,6 +12,7 @@
     <div class="bg-white rounded-lg shadow-sm p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Upload</h3>
         <form method="post" action="/panel/media/upload" enctype="multipart/form-data" class="space-y-4">
+            {{ csrf_input(request) }}
             <div>
                 <label for="file" class="block text-sm font-medium text-gray-700 mb-1">Plik (obrazek)</label>
                 <input type="file" id="file" name="file" required accept="image/*"
@@ -46,6 +47,7 @@
                                 class="text-xs text-blue-600 hover:text-blue-800">Kopiuj URL</button>
                         <form method="post" action="/panel/media/{{ m.id }}/delete" class="inline"
                               onsubmit="return confirm('Usunąć plik?')">
+                            {{ csrf_input(request) }}
                             <button type="submit" class="text-xs text-red-600 hover:text-red-800">Usuń</button>
                         </form>
                     </div>

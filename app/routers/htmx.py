@@ -69,6 +69,14 @@ async def htmx_comment_create(
             headers={"HX-Retarget": "#comment-errors", "HX-Reswap": "innerHTML"},
         )
 
+    if len(nickname) > 100 or len(content) > 2000:
+        return HTMLResponse(
+            '<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-3 text-sm">'
+            'Nick (max 100 znaków) lub komentarz (max 2000 znaków) jest za długi.</div>',
+            status_code=422,
+            headers={"HX-Retarget": "#comment-errors", "HX-Reswap": "innerHTML"},
+        )
+
     # Rate limit
     if not check_comment_rate_limit(client_ip):
         return HTMLResponse(

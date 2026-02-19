@@ -26,6 +26,7 @@
             {% endif %}
 
             <form method="post" action="/kontakt" class="space-y-4">
+                {{ csrf_input(request) }}
                 <!-- Honeypot -->
                 <div style="position: absolute; left: -9999px;">
                     <input type="text" name="website" tabindex="-1" autocomplete="off">

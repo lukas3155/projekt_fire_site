@@ -18,6 +18,7 @@
         {% endif %}
 
         <form method="post" action="/panel/login">
+            {{ csrf_input(request) }}
             <div class="mb-4">
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">
                     Nazwa użytkownika

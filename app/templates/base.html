@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block seo %}
+    <title>{% block title %}Projekt FIRE{% endblock %} | Projekt FIRE</title>
+    <meta name="description" content="{% block meta_description %}Blog o niezależności finansowej, inwestowaniu i oszczędzaniu. Twoja droga do FIRE.{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}{{ site_url }}{% endblock %}">
+    {% endblock %}
+
+    {% block og %}
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{{ self.title() }}">
+    <meta property="og:description" content="{{ self.meta_description() }}">
+    <meta property="og:url" content="{{ self.canonical() }}">
+    <meta property="og:site_name" content="Projekt FIRE">
+    <meta property="og:locale" content="pl_PL">
+    {% block og_image %}{% endblock %}
+    {% endblock %}
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fire: {
+                            50:  '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+    {% include "components/header.html" %}
+
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block breadcrumbs %}{% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "components/footer.html" %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

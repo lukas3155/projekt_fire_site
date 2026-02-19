@@ -1,0 +1,48 @@
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a href="/blog" class="text-xl font-bold text-fire-700 hover:text-fire-800 transition-colors">
+                Projekt FIRE
+            </a>
+
+            <!-- Desktop nav -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="/blog"
+                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'blog' %}text-fire-700{% endif %}">
+                    Blog
+                </a>
+                <a href="/tutaj-zacznij"
+                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'start' %}text-fire-700{% endif %}">
+                    Tutaj zacznij
+                </a>
+                <a href="/o-mnie"
+                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'about' %}text-fire-700{% endif %}">
+                    O mnie
+                </a>
+                <a href="/kontakt"
+                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'contact' %}text-fire-700{% endif %}">
+                    Kontakt
+                </a>
+            </nav>
+
+            <!-- Mobile hamburger -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                    onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile nav -->
+        <nav id="mobile-menu" class="hidden md:hidden pb-4 border-t border-gray-100">
+            <div class="flex flex-col gap-1 pt-3">
+                <a href="/blog" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">Blog</a>
+                <a href="/tutaj-zacznij" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">Tutaj zacznij</a>
+                <a href="/o-mnie" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">O mnie</a>
+                <a href="/kontakt" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">Kontakt</a>
+            </div>
+        </nav>
+    </div>
+</header>

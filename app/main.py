@@ -26,17 +26,16 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
-# Routers
+# Routers — order matters: specific routes before catch-all /{slug}
 from app.routers.panel import RequireLoginException, router as panel_router  # noqa: E402
+from app.routers.pages import router as pages_router  # noqa: E402
+from app.routers.blog import router as blog_router  # noqa: E402
 
 app.include_router(panel_router)
+app.include_router(pages_router)
+app.include_router(blog_router)  # Must be last — contains catch-all /{slug}
 
 
 @app.exception_handler(RequireLoginException)
 async def require_login_handler(request: Request, exc: RequireLoginException):
     return RedirectResponse(url="/panel/login", status_code=303)
-
-
-@app.get("/")
-async def root():
-    return {"message": "Projekt FIRE - w budowie"}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Kontakt{% endblock %}
+{% block meta_description %}Skontaktuj się z autorem bloga Projekt FIRE. Formularz kontaktowy, social media.{% endblock %}
+{% block canonical %}{{ site_url }}/kontakt{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Kontakt</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Form -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Napisz do mnie</h2>
+
+            {% if success %}
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+                Wiadomość wysłana! Odpowiem najszybciej jak mogę.
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="post" action="/kontakt" class="space-y-4">
+                <!-- Honeypot -->
+                <div style="position: absolute; left: -9999px;">
+                    <input type="text" name="website" tabindex="-1" autocomplete="off">
+                </div>
+
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Imię</label>
+                    <input type="text" id="name" name="name" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Temat</label>
+                    <input type="text" id="subject" name="subject" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Wiadomość</label>
+                    <textarea id="message" name="message" rows="5" required
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"></textarea>
+                </div>
+                <button type="submit"
+                        class="bg-fire-600 text-white px-6 py-2 rounded-md hover:bg-fire-700 transition-colors font-medium">
+                    Wyślij wiadomość
+                </button>
+            </form>
+        </div>
+
+        <!-- Info -->
+        <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Inne sposoby kontaktu</h2>
+                <ul class="space-y-3">
+                    <li class="flex items-center gap-3 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        {{ contact_email }}
+                    </li>
+                    <li>
+                        <a href="https://x.com/projektfire" target="_blank" rel="noopener noreferrer"
+                           class="flex items-center gap-3 text-sm text-gray-600 hover:text-fire-700">
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            @projektfire
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

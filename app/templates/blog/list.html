@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Blog{% endblock %}
+{% block meta_description %}Artykuły o niezależności finansowej, inwestowaniu i oszczędzaniu. Poznaj drogę do FIRE.{% endblock %}
+{% block canonical %}{{ site_url }}/blog{% if current_page > 1 %}/page/{{ current_page }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main column -->
+    <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Blog</h1>
+        </div>
+
+        <!-- Search -->
+        <div class="mb-8">
+            {% include "components/search_bar.html" %}
+        </div>
+
+        <!-- Articles -->
+        {% if articles %}
+        <div class="space-y-6">
+            {% for article in articles %}
+                {% include "components/article_card.html" %}
+            {% endfor %}
+        </div>
+
+        {% include "components/pagination.html" with context %}
+        {% else %}
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+            <p class="text-gray-500">Brak artykułów.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="space-y-6">
+        <!-- Categories -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Kategorie</h3>
+            <ul class="space-y-2">
+                {% for cat in sidebar_categories %}
+                <li>
+                    <a href="/kategoria/{{ cat.slug }}"
+                       class="text-sm text-gray-600 hover:text-fire-700 transition-colors">
+                        {{ cat.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Popular tags -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Tagi</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for tag in sidebar_tags %}
+                <a href="/tag/{{ tag.slug }}"
+                   class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-fire-50 hover:text-fire-700 transition-colors">
+                    {{ tag.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

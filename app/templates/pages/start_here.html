@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Tutaj zacznij{% endblock %}
+{% block meta_description %}Nie wiesz od czego zacząć? Tutaj znajdziesz najlepsze artykuły dla początkujących na drodze do niezależności finansowej.{% endblock %}
+{% block canonical %}{{ site_url }}/tutaj-zacznij{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">Tutaj zacznij</h1>
+    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+        Nie wiesz od czego zacząć? Poniżej znajdziesz artykuły stworzone specjalnie dla osób
+        rozpoczynających swoją drogę do niezależności finansowej. Czytaj po kolei lub wybierz temat,
+        który Cię najbardziej interesuje.
+    </p>
+</div>
+
+{% if articles %}
+<div class="space-y-6 max-w-3xl">
+    {% for article in articles %}
+        {% include "components/article_card.html" %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-lg shadow-sm p-8 text-center max-w-3xl">
+    <p class="text-gray-500">Artykuły dla początkujących pojawią się wkrótce!</p>
+</div>
+{% endif %}
+{% endblock %}

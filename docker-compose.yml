@@ -1,0 +1,41 @@
+services:
+  app:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+    environment:
+      - ENV=development
+      - SECRET_KEY=dev-secret-key-not-for-production
+      - SITE_URL=http://localhost:8000
+      - SITE_NAME=Projekt FIRE
+      - DATABASE_URL=postgresql+asyncpg://fire:fire@db:5432/projektfire
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin123
+      - CONTACT_EMAIL=kontakt@projektfire.pl
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=projektfire
+      - POSTGRES_USER=fire
+      - POSTGRES_PASSWORD=fire
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fire -d projektfire"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

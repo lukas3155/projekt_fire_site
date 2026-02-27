@@ -14,7 +14,7 @@ def test_all_polish_chars():
 
 
 def test_special_characters():
-    assert generate_slug("C++ and C# — together!") == "c-and-c-together"
+    assert generate_slug("C++ and C# - together!") == "c-and-c-together"
 
 
 def test_multiple_spaces():

@@ -43,6 +43,19 @@ services:
     depends_on:
       - app
 
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://fire:${POSTGRES_PASSWORD}@db:5432/umami
+      - APP_SECRET=${SECRET_KEY}
+      - BASE_PATH=/umami
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "3000"
+
   certbot:
     image: certbot/certbot
     volumes:

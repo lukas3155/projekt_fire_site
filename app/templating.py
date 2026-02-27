@@ -22,4 +22,5 @@ templates.env.globals.update({
     "site_name": settings.SITE_NAME,
     "current_year": datetime.now().year,
     "csrf_input": _csrf_input,
+    "config": settings,
 })

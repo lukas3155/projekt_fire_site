@@ -24,18 +24,18 @@
 <div class="bg-white rounded-lg shadow-sm p-6">
     <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-800">Ostatnie artykuły</h3>
-        <a href="/panel/articles/new" class="text-sm text-green-600 hover:text-green-800">+ Nowy artykuł</a>
+        <a href="/panel/articles/new" class="text-sm text-fire-700 hover:text-fire-900">+ Nowy artykuł</a>
     </div>
     {% if recent_articles %}
     <ul class="divide-y divide-gray-100">
         {% for article in recent_articles %}
         <li class="py-3 flex items-center justify-between">
             <div>
-                <a href="/panel/articles/{{ article.id }}/edit" class="text-gray-800 hover:text-green-600 font-medium">
+                <a href="/panel/articles/{{ article.id }}/edit" class="text-gray-800 hover:text-fire-700 font-medium">
                     {{ article.title }}
                 </a>
                 <span class="ml-2 text-xs px-2 py-0.5 rounded-full
-                    {% if article.status.value == 'published' %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                    {% if article.status.value == 'published' %}bg-fire-50 text-fire-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
                     {{ article.status.value }}
                 </span>
             </div>
@@ -44,7 +44,7 @@
         {% endfor %}
     </ul>
     {% else %}
-    <p class="text-gray-500">Brak artykułów. <a href="/panel/articles/new" class="text-green-600 hover:underline">Utwórz pierwszy!</a></p>
+    <p class="text-gray-500">Brak artykułów. <a href="/panel/articles/new" class="text-fire-700 hover:underline">Utwórz pierwszy!</a></p>
     {% endif %}
 </div>
 {% endblock %}

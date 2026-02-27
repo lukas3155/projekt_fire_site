@@ -36,7 +36,7 @@
     <!-- Sidebar -->
     <aside class="space-y-6">
         <!-- Categories -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
             <h3 class="text-sm font-semibold text-gray-800 mb-3">Kategorie</h3>
             <ul class="space-y-2">
                 {% for cat in sidebar_categories %}
@@ -50,18 +50,6 @@
             </ul>
         </div>
 
-        <!-- Popular tags -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-sm font-semibold text-gray-800 mb-3">Tagi</h3>
-            <div class="flex flex-wrap gap-2">
-                {% for tag in sidebar_tags %}
-                <a href="/tag/{{ tag.slug }}"
-                   class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-fire-50 hover:text-fire-700 transition-colors">
-                    {{ tag.name }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
     </aside>
 </div>
 {% endblock %}

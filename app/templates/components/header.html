@@ -1,27 +1,48 @@
-<header class="bg-white shadow-sm sticky top-0 z-50">
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
+        <div class="flex items-center justify-between h-20">
             <!-- Logo -->
-            <a href="/blog" class="text-xl font-bold text-fire-700 hover:text-fire-800 transition-colors">
+            <a href="/blog" class="text-xl font-bold text-fire-900 tracking-tight hover:text-black transition-colors">
                 Projekt FIRE
             </a>
 
             <!-- Desktop nav -->
             <nav class="hidden md:flex items-center gap-8">
                 <a href="/blog"
-                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'blog' %}text-fire-700{% endif %}">
+                   class="text-sm font-medium text-gray-500 hover:text-fire-900 transition-colors {% if active_nav == 'blog' %}text-fire-900{% endif %}">
                     Blog
                 </a>
                 <a href="/tutaj-zacznij"
-                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'start' %}text-fire-700{% endif %}">
+                   class="text-sm font-medium text-gray-500 hover:text-fire-900 transition-colors {% if active_nav == 'start' %}text-fire-900{% endif %}">
                     Tutaj zacznij
                 </a>
+                <!-- Kalkulator dropdown -->
+                <div class="relative group">
+                    <button class="text-sm font-medium text-gray-500 hover:text-fire-900 transition-colors inline-flex items-center gap-1 {% if active_nav == 'calculator' %}text-fire-900{% endif %}">
+                        Kalkulator
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="absolute left-0 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-lg py-1">
+                            <a href="/kalkulator-fire"
+                               class="block px-4 py-2.5 text-sm text-gray-600 hover:text-fire-900 hover:bg-gray-50 transition-colors">
+                                Kalkulator FIRE
+                            </a>
+                            <a href="/kalkulator-procent-skladany"
+                               class="block px-4 py-2.5 text-sm text-gray-600 hover:text-fire-900 hover:bg-gray-50 transition-colors">
+                                Procent składany
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <a href="/o-mnie"
-                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'about' %}text-fire-700{% endif %}">
+                   class="text-sm font-medium text-gray-500 hover:text-fire-900 transition-colors {% if active_nav == 'about' %}text-fire-900{% endif %}">
                     O mnie
                 </a>
                 <a href="/kontakt"
-                   class="text-sm font-medium text-gray-600 hover:text-fire-700 transition-colors {% if active_nav == 'contact' %}text-fire-700{% endif %}">
+                   class="text-sm font-medium text-gray-500 hover:text-fire-900 transition-colors {% if active_nav == 'contact' %}text-fire-900{% endif %}">
                     Kontakt
                 </a>
             </nav>
@@ -38,10 +59,22 @@
         <!-- Mobile nav -->
         <nav id="mobile-menu" class="hidden md:hidden pb-4 border-t border-gray-100">
             <div class="flex flex-col gap-1 pt-3">
-                <a href="/blog" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">Blog</a>
-                <a href="/tutaj-zacznij" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">Tutaj zacznij</a>
-                <a href="/o-mnie" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">O mnie</a>
-                <a href="/kontakt" class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-fire-700 hover:bg-gray-50">Kontakt</a>
+                <a href="/blog" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-fire-900 hover:bg-gray-50">Blog</a>
+                <a href="/tutaj-zacznij" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-fire-900 hover:bg-gray-50">Tutaj zacznij</a>
+                <!-- Kalkulator mobile submenu -->
+                <button onclick="document.getElementById('mobile-calc-submenu').classList.toggle('hidden')"
+                        class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-fire-900 hover:bg-gray-50 text-left inline-flex items-center justify-between w-full {% if active_nav == 'calculator' %}text-fire-900{% endif %}">
+                    Kalkulator
+                    <svg id="mobile-calc-chevron" class="w-3.5 h-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div id="mobile-calc-submenu" class="hidden pl-4 flex flex-col gap-1">
+                    <a href="/kalkulator-fire" class="px-3 py-2 rounded-md text-sm text-gray-500 hover:text-fire-900 hover:bg-gray-50">Kalkulator FIRE</a>
+                    <a href="/kalkulator-procent-skladany" class="px-3 py-2 rounded-md text-sm text-gray-500 hover:text-fire-900 hover:bg-gray-50">Procent składany</a>
+                </div>
+                <a href="/o-mnie" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-fire-900 hover:bg-gray-50">O mnie</a>
+                <a href="/kontakt" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-fire-900 hover:bg-gray-50">Kontakt</a>
             </div>
         </nav>
     </div>

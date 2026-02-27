@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Panel{% endblock %} | Projekt FIRE</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fire: {
+                            50:  '#fafafa',
+                            100: '#f5f5f5',
+                            200: '#e5e5e5',
+                            300: '#d4d4d4',
+                            400: '#a3a3a3',
+                            500: '#737373',
+                            600: '#404040',
+                            700: '#262626',
+                            800: '#171717',
+                            900: '#0a0a0a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     {% block head %}{% endblock %}
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -35,6 +57,10 @@
                 <a href="/panel/comments"
                    class="block px-3 py-2 rounded-md text-sm hover:bg-gray-700 {% if active_page == 'comments' %}bg-gray-700{% endif %}">
                     Komentarze
+                </a>
+                <a href="/panel/messages"
+                   class="block px-3 py-2 rounded-md text-sm hover:bg-gray-700 {% if active_page == 'messages' %}bg-gray-700{% endif %}">
+                    Wiadomości
                 </a>
                 <a href="/panel/media"
                    class="block px-3 py-2 rounded-md text-sm hover:bg-gray-700 {% if active_page == 'media' %}bg-gray-700{% endif %}">
@@ -68,7 +94,7 @@
         <!-- Main content -->
         <main class="flex-1 p-8">
             {% if flash_success %}
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
+            <div class="bg-gray-100 border border-gray-300 text-gray-800 px-4 py-3 rounded mb-6">
                 {{ flash_success }}
             </div>
             {% endif %}

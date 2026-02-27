@@ -12,8 +12,8 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
 def _csrf_input(request):
-    """Return a hidden input with the CSRF token from the cookie."""
-    token = request.cookies.get("csrf_token", "")
+    """Return a hidden input with the CSRF token (set by CSRFMiddleware)."""
+    token = getattr(request.state, "csrf_token", "") or request.cookies.get("csrf_token", "")
     return Markup(f'<input type="hidden" name="csrf_token" value="{token}">')
 
 

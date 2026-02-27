@@ -17,14 +17,14 @@
                 <div class="flex items-center gap-3 mb-2">
                     <span class="font-medium text-gray-800">{{ comment.nickname }}</span>
                     <span class="text-xs text-gray-400">{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                    <span class="text-xs text-gray-400">IP: {{ comment.ip_address or '—' }}</span>
+                    <span class="text-xs text-gray-400">IP: {{ comment.ip_address or '-' }}</span>
                     {% if not comment.is_approved %}
                     <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Ukryty</span>
                     {% endif %}
                 </div>
                 <p class="text-gray-700 text-sm mb-2">{{ comment.content }}</p>
                 <a href="/panel/articles/{{ comment.article_id }}/edit"
-                   class="text-xs text-blue-600 hover:text-blue-800">
+                   class="text-xs text-fire-700 hover:text-fire-900">
                     → {{ comment.article.title if comment.article else 'Artykuł #' + comment.article_id|string }}
                 </a>
             </div>
@@ -32,7 +32,7 @@
                 {% if not comment.is_approved %}
                 <form method="post" action="/panel/comments/{{ comment.id }}/approve">
                     {{ csrf_input(request) }}
-                    <button type="submit" class="text-sm text-green-600 hover:text-green-800 px-2 py-1">Zatwierdź</button>
+                    <button type="submit" class="text-sm text-fire-700 hover:text-fire-900 px-2 py-1">Zatwierdź</button>
                 </form>
                 {% else %}
                 <form method="post" action="/panel/comments/{{ comment.id }}/hide">

@@ -1,4 +1,4 @@
-<article class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+<article class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
     {% if article.featured_image %}
     <a href="/{{ article.slug }}">
         <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="w-full h-48 object-cover" loading="lazy">
@@ -18,7 +18,7 @@
             </time>
         </div>
 
-        <h2 class="text-xl font-bold text-gray-800 mb-2 leading-tight">
+        <h2 class="text-xl font-bold text-gray-900 mb-2 leading-snug">
             <a href="/{{ article.slug }}" class="hover:text-fire-700 transition-colors">
                 {{ article.title }}
             </a>
@@ -28,17 +28,8 @@
         <p class="text-gray-600 text-sm leading-relaxed mb-4">{{ article.excerpt }}</p>
         {% endif %}
 
-        <div class="flex items-center justify-between">
-            {% if article.tags %}
-            <div class="flex flex-wrap gap-1">
-                {% for tag in article.tags[:3] %}
-                <a href="/tag/{{ tag.slug }}" class="text-xs text-gray-400 hover:text-fire-600">#{{ tag.name }}</a>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div></div>
-            {% endif %}
-            <a href="/{{ article.slug }}" class="text-sm font-medium text-fire-600 hover:text-fire-800 transition-colors">
+        <div class="flex items-center justify-end">
+            <a href="/{{ article.slug }}" class="text-sm font-medium text-fire-700 hover:text-fire-900 hover:underline transition-colors">
                 Czytaj dalej &rarr;
             </a>
         </div>

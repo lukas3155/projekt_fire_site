@@ -4,6 +4,41 @@
 
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<style>
+    .editor-preview, .editor-preview-side {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.7;
+        color: #1f2937;
+    }
+    .editor-preview h1, .editor-preview-side h1 { font-size: 2em; font-weight: 700; margin: 0.8em 0 0.4em; }
+    .editor-preview h2, .editor-preview-side h2 { font-size: 1.5em; font-weight: 700; margin: 0.8em 0 0.4em; }
+    .editor-preview h3, .editor-preview-side h3 { font-size: 1.25em; font-weight: 600; margin: 0.8em 0 0.4em; }
+    .editor-preview h4, .editor-preview-side h4 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.4em; }
+    .editor-preview p, .editor-preview-side p { margin: 0.6em 0; }
+    .editor-preview ul, .editor-preview-side ul { list-style: disc; padding-left: 1.5em; margin: 0.6em 0; }
+    .editor-preview ol, .editor-preview-side ol { list-style: decimal; padding-left: 1.5em; margin: 0.6em 0; }
+    .editor-preview li, .editor-preview-side li { margin: 0.25em 0; }
+    .editor-preview blockquote, .editor-preview-side blockquote {
+        border-left: 4px solid #404040; padding-left: 1em; margin: 0.8em 0; color: #4b5563; font-style: italic;
+    }
+    .editor-preview code, .editor-preview-side code {
+        background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em;
+    }
+    .editor-preview pre, .editor-preview-side pre {
+        background: #1f2937; color: #e5e7eb; padding: 1em; border-radius: 6px; overflow-x: auto; margin: 0.8em 0;
+    }
+    .editor-preview pre code, .editor-preview-side pre code { background: none; padding: 0; }
+    .editor-preview a, .editor-preview-side a { color: #262626; text-decoration: underline; }
+    .editor-preview img, .editor-preview-side img { max-width: 100%; border-radius: 6px; margin: 0.8em 0; }
+    .editor-preview hr, .editor-preview-side hr { border: none; border-top: 1px solid #d1d5db; margin: 1.5em 0; }
+    .editor-preview strong, .editor-preview-side strong { font-weight: 700; }
+    .editor-preview em, .editor-preview-side em { font-style: italic; }
+    .editor-preview table, .editor-preview-side table { border-collapse: collapse; width: 100%; margin: 0.8em 0; }
+    .editor-preview th, .editor-preview td, .editor-preview-side th, .editor-preview-side td {
+        border: 1px solid #d1d5db; padding: 0.5em 0.75em; text-align: left;
+    }
+    .editor-preview th, .editor-preview-side th { background: #f9fafb; font-weight: 600; }
+</style>
 {% endblock %}
 
 {% block content %}

@@ -13,7 +13,7 @@ Podczas review ZAWSZE oceniaj:
 - potencjalne edge case’y
 - zgodność intencji zmian z ich zakresem
 
-Nie oceniaj gustu — oceniaj jakość.
+Nie oceniaj gustu - oceniaj jakość.
 
 ---
 
@@ -154,4 +154,4 @@ Na końcu ZAWSZE dodaj krótkie podsumowanie:
 Podsumowanie:
 Kod jest czytelny i spójny.
 Wymaga poprawy obsługi błędów w module auth.
-Po adresowaniu uwag typu Critical i Important — gotowy do merge.
+Po adresowaniu uwag typu Critical i Important - gotowy do merge.

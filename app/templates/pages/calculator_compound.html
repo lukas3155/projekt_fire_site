@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}Kalkulator procentu składanego{% endblock %}
+{% block meta_description %}Kalkulator procentu składanego - oblicz, jak Twoje oszczędności rosną dzięki sile reinwestowania odsetek.{% endblock %}
+{% block canonical %}{{ site_url }}/kalkulator-procent-skladany{% endblock %}
+
+{% block head %}
+<style>
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        background: #e5e5e5;
+        border-radius: 3px;
+        outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: #404040;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        background: #404040;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">Kalkulator procentu składanego</h1>
+        <p class="text-gray-600 leading-relaxed">
+            Procent składany to mechanizm, w którym odsetki są reinwestowane i same generują kolejne zyski.
+            Oblicz, jak Twój kapitał rośnie w czasie dzięki regularnym wpłatom i sile kapitalizacji.
+        </p>
+    </div>
+
+    <!-- Input form -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-6">Dane wejściowe</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+
+            <!-- Kapitał początkowy -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="startCapital" class="text-sm font-medium text-gray-700">Kapitał początkowy</label>
+                    <span class="text-xs text-gray-400">zł</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="startCapital-range" min="0" max="2000000" step="1000" value="10000"
+                           class="flex-1" oninput="syncFromRange('startCapital', this.value)">
+                    <input type="number" id="startCapital" min="0" max="2000000" step="1000" value="10000"
+                           class="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('startCapital', this.value)">
+                </div>
+            </div>
+
+            <!-- Miesięczna wpłata -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="monthlyContrib" class="text-sm font-medium text-gray-700">Miesięczna wpłata</label>
+                    <span class="text-xs text-gray-400">zł</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="monthlyContrib-range" min="0" max="25000" step="100" value="1000"
+                           class="flex-1" oninput="syncFromRange('monthlyContrib', this.value)">
+                    <input type="number" id="monthlyContrib" min="0" max="25000" step="100" value="1000"
+                           class="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('monthlyContrib', this.value)">
+                </div>
+            </div>
+
+            <!-- Roczny wzrost wpłat -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="contribGrowth" class="text-sm font-medium text-gray-700">Roczny wzrost wpłat</label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="contribGrowth-range" min="0" max="15" step="0.5" value="0"
+                           class="flex-1" oninput="syncFromRange('contribGrowth', this.value)">
+                    <input type="number" id="contribGrowth" min="0" max="15" step="0.5" value="0"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('contribGrowth', this.value)">
+                </div>
+            </div>
+
+            <!-- Okres inwestowania -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="years" class="text-sm font-medium text-gray-700">Okres inwestowania</label>
+                    <span class="text-xs text-gray-400">lat</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="years-range" min="1" max="50" step="1" value="20"
+                           class="flex-1" oninput="syncFromRange('years', this.value)">
+                    <input type="number" id="years" min="1" max="50" step="1" value="20"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('years', this.value)">
+                </div>
+            </div>
+
+            <!-- Roczna stopa zwrotu -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="annualReturn" class="text-sm font-medium text-gray-700">Roczna stopa zwrotu</label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="annualReturn-range" min="0" max="20" step="0.1" value="7"
+                           class="flex-1" oninput="syncFromRange('annualReturn', this.value)">
+                    <input type="number" id="annualReturn" min="0" max="20" step="0.1" value="7"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('annualReturn', this.value)">
+                </div>
+            </div>
+
+            <!-- Inflacja roczna -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="inflation" class="text-sm font-medium text-gray-700">Inflacja roczna</label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="inflation-range" min="0" max="10" step="0.1" value="3"
+                           class="flex-1" oninput="syncFromRange('inflation', this.value)">
+                    <input type="number" id="inflation" min="0" max="10" step="0.1" value="3"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('inflation', this.value)">
+                </div>
+            </div>
+
+            <!-- Częstotliwość kapitalizacji -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="compFreq" class="text-sm font-medium text-gray-700">Częstotliwość kapitalizacji</label>
+                </div>
+                <select id="compFreq" onchange="recalculate()"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent bg-white">
+                    <option value="1">Rocznie</option>
+                    <option value="4">Kwartalnie</option>
+                    <option value="12" selected>Miesięcznie</option>
+                    <option value="365">Dziennie</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Wartość końcowa</p>
+            <p id="kpi-final" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p id="kpi-final-real" class="text-xs text-gray-400 mt-1">zł</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Suma wpłat</p>
+            <p id="kpi-contribs" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p class="text-xs text-gray-400 mt-1">zł</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Zysk z odsetek</p>
+            <p id="kpi-interest" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p id="kpi-interest-real" class="text-xs text-gray-400 mt-1">zł</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Mnożnik kapitału</p>
+            <p id="kpi-multiplier" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p class="text-xs text-gray-400 mt-1">×</p>
+        </div>
+    </div>
+    <p class="text-xs text-gray-400 mb-8">Wartości nominalne. W nawiasach - realna siła nabywcza po uwzględnieniu inflacji.</p>
+
+    <!-- Chart -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-1">Wzrost kapitału w czasie</h2>
+        <p class="text-sm text-gray-500 mb-4">Podział na wpłaty własne i zysk z odsetek (wartości nominalne, przerywana linia - realna siła nabywcza)</p>
+        <div class="relative" style="height: 400px;">
+            <canvas id="compoundChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Info section -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Jak działa procent składany?</h2>
+        <div class="space-y-4 text-sm text-gray-600 leading-relaxed">
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Wzór na procent składany</h3>
+                <p>Podstawowy wzór to <strong>A = P(1 + r/n)<sup>nt</sup></strong>, gdzie P to kapitał początkowy, r to roczna stopa zwrotu, n to liczba kapitalizacji w roku, a t to liczba lat. Kalkulator uwzględnia dodatkowo regularne wpłaty i ich roczny wzrost.</p>
+            </div>
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Siła kapitalizacji</h3>
+                <p>Im częstsza kapitalizacja, tym szybciej rośnie kapitał - odsetki doliczane są częściej i same zaczynają „pracować" wcześniej. Różnica między kapitalizacją roczną a miesięczną jest zauważalna przy dłuższych horyzontach czasowych.</p>
+            </div>
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Regularne wpłaty</h3>
+                <p>Nawet niewielkie, ale systematyczne wpłaty mogą znacząco zwiększyć końcową wartość portfela. Kluczem jest konsekwencja i czas - im wcześniej zaczniesz, tym więcej lat procent składany pracuje na Twoją korzyść.</p>
+            </div>
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Inflacja i realna wartość</h3>
+                <p>Inflacja zmniejsza siłę nabywczą pieniądza w czasie. Kalkulator pokazuje zarówno wartość nominalną (ile będziesz mieć na koncie), jak i realną (ile te pieniądze będą warte w dzisiejszych złotówkach). Przerywana linia na wykresie to realna siła nabywcza Twojego kapitału.</p>
+            </div>
+            <div class="bg-gray-50 rounded-md p-4 text-xs text-gray-500">
+                <strong>Zastrzeżenie:</strong> Kalkulator ma charakter wyłącznie edukacyjny i nie stanowi porady finansowej ani inwestycyjnej. Wyniki symulacji opierają się na uproszczonych założeniach i nie gwarantują przyszłych rezultatów. Przed podjęciem decyzji finansowych skonsultuj się z licencjonowanym doradcą.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    // === Field sync ===
+    window.syncFromRange = function(id, val) {
+        document.getElementById(id).value = val;
+        recalculate();
+    };
+    window.syncFromInput = function(id, val) {
+        var range = document.getElementById(id + '-range');
+        if (range) range.value = val;
+        recalculate();
+    };
+
+    window.recalculate = function() {
+        clearTimeout(recalcTimer);
+        recalcTimer = setTimeout(doRecalculate, 80);
+    };
+
+    function getVal(id) {
+        return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function formatPLN(n) {
+        if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' mln';
+        if (n >= 1e3) return Math.round(n).toLocaleString('pl-PL');
+        return Math.round(n).toString();
+    }
+
+    // === Compound interest calculation ===
+    function calcCompound(startCapital, monthlyContrib, contribGrowth, years, annualReturn, compFreq, inflation) {
+        var periodRate = (annualReturn / 100) / compFreq;
+        var capital = startCapital;
+        var totalContribs = startCapital;
+        var currentMonthly = monthlyContrib;
+
+        var data = [];
+
+        for (var y = 1; y <= years; y++) {
+            for (var p = 0; p < compFreq; p++) {
+                var contribPerPeriod = currentMonthly * 12 / compFreq;
+                capital = capital * (1 + periodRate) + contribPerPeriod;
+                totalContribs += contribPerPeriod;
+            }
+            currentMonthly *= (1 + contribGrowth / 100);
+            var deflator = Math.pow(1 + inflation / 100, y);
+            data.push({
+                year: y,
+                capital: capital,
+                totalContribs: totalContribs,
+                interest: capital - totalContribs,
+                realCapital: capital / deflator
+            });
+        }
+
+        return data;
+    }
+
+    // === Chart ===
+    var chart = null;
+
+    function buildChart(data) {
+        var ctx = document.getElementById('compoundChart').getContext('2d');
+
+        if (chart) chart.destroy();
+
+        var labels = data.map(function(d) { return d.year; });
+        var contribsData = data.map(function(d) { return d.totalContribs; });
+        var interestData = data.map(function(d) { return d.interest; });
+        var totalData = data.map(function(d) { return d.capital; });
+        var realData = data.map(function(d) { return d.realCapital; });
+
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Suma wpłat',
+                        data: contribsData,
+                        backgroundColor: '#a3a3a3',
+                        stack: 'stack',
+                        order: 3
+                    },
+                    {
+                        label: 'Odsetki',
+                        data: interestData,
+                        backgroundColor: '#262626',
+                        stack: 'stack',
+                        order: 2
+                    },
+                    {
+                        label: 'Wartość nominalna',
+                        data: totalData,
+                        type: 'line',
+                        borderColor: '#262626',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.3,
+                        fill: false,
+                        yAxisID: 'yLine',
+                        order: 0
+                    },
+                    {
+                        label: 'Wartość realna (po inflacji)',
+                        data: realData,
+                        type: 'line',
+                        borderColor: '#737373',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointRadius: 0,
+                        tension: 0.3,
+                        fill: false,
+                        yAxisID: 'yLine',
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 16,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(items) {
+                                return 'Rok ' + items[0].label;
+                            },
+                            label: function(context) {
+                                var val = context.parsed.y;
+                                if (val >= 1e6) {
+                                    return context.dataset.label + ': ' + (val / 1e6).toFixed(2).replace('.', ',') + ' mln zł';
+                                }
+                                return context.dataset.label + ': ' + Math.round(val).toLocaleString('pl-PL') + ' zł';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Rok', font: { size: 12 } },
+                        grid: { display: false },
+                        stacked: true
+                    },
+                    y: {
+                        title: { display: true, text: 'Wartość (zł)', font: { size: 12 } },
+                        stacked: true,
+                        ticks: {
+                            callback: function(val) {
+                                if (val >= 1e6) return (val / 1e6).toFixed(1) + ' mln';
+                                if (val >= 1e3) return (val / 1e3).toFixed(0) + ' tys.';
+                                return val;
+                            }
+                        },
+                        beginAtZero: true
+                    },
+                    yLine: {
+                        display: false,
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // === Main recalculate ===
+    var recalcTimer = null;
+
+    function doRecalculate() {
+        var startCapital = getVal('startCapital');
+        var monthlyContrib = getVal('monthlyContrib');
+        var contribGrowth = getVal('contribGrowth');
+        var years = getVal('years');
+        var annualReturn = getVal('annualReturn');
+        var inflation = getVal('inflation');
+        var compFreq = parseInt(document.getElementById('compFreq').value) || 12;
+
+        var data = calcCompound(startCapital, monthlyContrib, contribGrowth, years, annualReturn, compFreq, inflation);
+
+        // KPI
+        var last = data.length > 0 ? data[data.length - 1] : { capital: startCapital, totalContribs: startCapital, interest: 0, realCapital: startCapital };
+        var multiplier = last.totalContribs > 0 ? last.capital / last.totalContribs : 0;
+        var realInterest = last.realCapital - last.totalContribs;
+
+        document.getElementById('kpi-final').textContent = formatPLN(last.capital);
+        document.getElementById('kpi-final-real').textContent = 'realnie: ' + formatPLN(last.realCapital) + ' zł';
+        document.getElementById('kpi-contribs').textContent = formatPLN(last.totalContribs);
+        document.getElementById('kpi-interest').textContent = formatPLN(last.interest);
+        document.getElementById('kpi-interest-real').textContent = 'realnie: ' + formatPLN(realInterest > 0 ? realInterest : 0) + ' zł';
+        document.getElementById('kpi-multiplier').textContent = multiplier.toFixed(2).replace('.', ',');
+
+        // Chart
+        buildChart(data);
+    }
+
+    // Run on load
+    recalculate();
+})();
+</script>
+{% endblock %}

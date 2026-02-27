@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}Kalkulator FIRE{% endblock %}
+{% block meta_description %}Kalkulator FIRE - oblicz ile potrzebujesz do niezależności finansowej. Procent składany, stopa oszczędzania, Twoja liczba FIRE.{% endblock %}
+{% block canonical %}{{ site_url }}/kalkulator-fire{% endblock %}
+
+{% block head %}
+<style>
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        background: #e5e5e5;
+        border-radius: 3px;
+        outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: #404040;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        background: #404040;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">Kalkulator FIRE</h1>
+        <p class="text-gray-600 leading-relaxed">
+            Oblicz, ile musisz zgromadzić, aby osiągnąć niezależność finansową (FIRE - Financial Independence, Retire Early).
+            Kalkulator uwzględnia inflację
+        </p>
+    </div>
+
+    <!-- Input form -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-6">Dane wejściowe</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+
+            <!-- Wiek obecny -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="ageNow" class="text-sm font-medium text-gray-700">Wiek obecny</label>
+                    <span class="text-xs text-gray-400">lat</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="ageNow-range" min="18" max="70" step="1" value="30"
+                           class="flex-1" oninput="syncFromRange('ageNow', this.value)">
+                    <input type="number" id="ageNow" min="18" max="70" step="1" value="30"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('ageNow', this.value)">
+                </div>
+            </div>
+
+            <!-- Oczekiwana długość życia -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="lifeExpectancy" class="text-sm font-medium text-gray-700">Oczekiwana długość życia</label>
+                    <span class="text-xs text-gray-400">lat</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="lifeExpectancy-range" min="60" max="100" step="1" value="85"
+                           class="flex-1" oninput="syncFromRange('lifeExpectancy', this.value)">
+                    <input type="number" id="lifeExpectancy" min="60" max="100" step="1" value="85"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('lifeExpectancy', this.value)">
+                </div>
+            </div>
+
+            <!-- Kapitał startowy -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="startCapital" class="text-sm font-medium text-gray-700">Kapitał startowy</label>
+                    <span class="text-xs text-gray-400">zł</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="startCapital-range" min="0" max="2000000" step="1000" value="50000"
+                           class="flex-1" oninput="syncFromRange('startCapital', this.value)">
+                    <input type="number" id="startCapital" min="0" max="2000000" step="1000" value="50000"
+                           class="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('startCapital', this.value)">
+                </div>
+            </div>
+
+            <!-- Miesięczne oszczędności -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="monthlyContrib" class="text-sm font-medium text-gray-700">Miesięczne oszczędności</label>
+                    <span class="text-xs text-gray-400">zł</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="monthlyContrib-range" min="0" max="25000" step="100" value="3000"
+                           class="flex-1" oninput="syncFromRange('monthlyContrib', this.value)">
+                    <input type="number" id="monthlyContrib" min="0" max="25000" step="100" value="3000"
+                           class="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('monthlyContrib', this.value)">
+                </div>
+            </div>
+
+            <!-- Roczny wzrost oszczędności -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="contribGrowth" class="text-sm font-medium text-gray-700">Roczny wzrost oszczędności</label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="contribGrowth-range" min="0" max="15" step="0.5" value="0"
+                           class="flex-1" oninput="syncFromRange('contribGrowth', this.value)">
+                    <input type="number" id="contribGrowth" min="0" max="15" step="0.5" value="0"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('contribGrowth', this.value)">
+                </div>
+            </div>
+
+            <!-- Miesięczne wydatki -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="monthlySpend" class="text-sm font-medium text-gray-700">Miesięczne wydatki</label>
+                    <span class="text-xs text-gray-400">zł</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="monthlySpend-range" min="0" max="25000" step="100" value="5000"
+                           class="flex-1" oninput="syncFromRange('monthlySpend', this.value)">
+                    <input type="number" id="monthlySpend" min="0" max="25000" step="100" value="5000"
+                           class="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('monthlySpend', this.value)">
+                </div>
+            </div>
+
+            <!-- SWR -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="swr" class="text-sm font-medium text-gray-700">
+                        Bezpieczna stopa wypłat (SWR)
+                    </label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="swr-range" min="2" max="6" step="0.1" value="4"
+                           class="flex-1" oninput="syncFromRange('swr', this.value)">
+                    <input type="number" id="swr" min="2" max="6" step="0.1" value="4"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('swr', this.value)">
+                </div>
+            </div>
+
+            <!-- Roczna stopa zwrotu -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="retNominal" class="text-sm font-medium text-gray-700">Roczna stopa zwrotu (nominalna)</label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="retNominal-range" min="0" max="20" step="0.1" value="8"
+                           class="flex-1" oninput="syncFromRange('retNominal', this.value)">
+                    <input type="number" id="retNominal" min="0" max="20" step="0.1" value="8"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('retNominal', this.value)">
+                </div>
+            </div>
+
+            <!-- Inflacja -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="inflation" class="text-sm font-medium text-gray-700">Inflacja roczna</label>
+                    <span class="text-xs text-gray-400">%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="inflation-range" min="0" max="10" step="0.1" value="3"
+                           class="flex-1" oninput="syncFromRange('inflation', this.value)">
+                    <input type="number" id="inflation" min="0" max="10" step="0.1" value="3"
+                           class="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
+                           oninput="syncFromInput('inflation', this.value)">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Twoja liczba FIRE</p>
+            <p id="kpi-fire-number" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p class="text-xs text-gray-400 mt-1">zł</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Lata do FIRE</p>
+            <p id="kpi-years" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p class="text-xs text-gray-400 mt-1">lat</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Wiek FIRE</p>
+            <p id="kpi-age" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p class="text-xs text-gray-400 mt-1">lat</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Stopa oszczędzania</p>
+            <p id="kpi-savings-rate" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
+            <p class="text-xs text-gray-400 mt-1">%</p>
+        </div>
+    </div>
+
+    <!-- Compound Interest Chart -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-1">Wzrost kapitału</h2>
+        <p class="text-sm text-gray-500 mb-4">Projekcja na podstawie procentu składanego z uwzględnieniem inflacji</p>
+        <div class="relative" style="height: 400px;">
+            <canvas id="growthChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Info section -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Jak działa kalkulator?</h2>
+        <div class="space-y-4 text-sm text-gray-600 leading-relaxed">
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Twoja liczba FIRE</h3>
+                <p>To kwota, którą musisz zgromadzić, aby żyć z odsetek od kapitału. Obliczana jako roczne wydatki podzielone przez bezpieczną stopę wypłat (SWR). Przy wydatkach 5 000 zł/mies. i SWR 4% twoja liczba FIRE to 1 500 000 zł.</p>
+            </div>
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Zasada 4% (SWR)</h3>
+                <p>Badanie Trinity Study wykazało, że wypłacanie 4% rocznie z portfela akcji i obligacji daje wysokie prawdopodobieństwo, że kapitał nie wyczerpie się przez 30 lat. Możesz dostosować SWR do swojego poziomu ryzyka.</p>
+            </div>
+            <div>
+                <h3 class="font-medium text-gray-800 mb-1">Procent składany</h3>
+                <p>Wykres pokazuje wzrost kapitału w czasie dzięki sile procentu składanego - odsetki są reinwestowane i same generują kolejne zyski. Uwzględniona jest inflacja, dzięki czemu widzisz realną siłę nabywczą swoich oszczędności.</p>
+            </div>
+            <div class="bg-gray-50 rounded-md p-4 text-xs text-gray-500">
+                <strong>Zastrzeżenie:</strong> Kalkulator ma charakter wyłącznie edukacyjny i nie stanowi porady finansowej ani inwestycyjnej. Wyniki symulacji opierają się na uproszczonych założeniach i nie gwarantują przyszłych rezultatów. Przed podjęciem decyzji finansowych skonsultuj się z licencjonowanym doradcą.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    // === Field sync ===
+    window.syncFromRange = function(id, val) {
+        document.getElementById(id).value = val;
+        recalculate();
+    };
+    window.syncFromInput = function(id, val) {
+        document.getElementById(id + '-range').value = val;
+        recalculate();
+    };
+
+    function getVal(id) {
+        return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function formatPLN(n) {
+        if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' mln';
+        if (n >= 1e3) return Math.round(n).toLocaleString('pl-PL');
+        return Math.round(n).toString();
+    }
+
+    // === KPI calculations ===
+    function calcFireNumber(monthlySpend, swr) {
+        return (monthlySpend * 12) / (swr / 100);
+    }
+
+    function calcYearsToFire(startCapital, monthlyContrib, fireNumber, retNominal, inflation, contribGrowth) {
+        var realReturn = ((1 + retNominal / 100) / (1 + inflation / 100)) - 1;
+        var monthlyReturn = realReturn / 12;
+        var capital = startCapital;
+        var months = 0;
+        var maxMonths = 100 * 12;
+        var currentContrib = monthlyContrib;
+
+        if (monthlyContrib <= 0 && capital < fireNumber) return Infinity;
+
+        while (capital < fireNumber && months < maxMonths) {
+            capital = capital * (1 + monthlyReturn) + currentContrib;
+            months++;
+            if (months % 12 === 0) {
+                currentContrib *= (1 + contribGrowth / 100);
+            }
+        }
+
+        return months >= maxMonths ? Infinity : months / 12;
+    }
+
+    // === Compound interest projection ===
+    function calcProjection(params) {
+        var ageNow = params.ageNow;
+        var lifeExp = params.lifeExpectancy;
+        var totalYears = lifeExp - ageNow;
+        var realReturn = ((1 + params.retNominal / 100) / (1 + params.inflation / 100)) - 1;
+        var monthlyReturn = realReturn / 12;
+
+        var capital = params.startCapital;
+        var currentContrib = params.monthlyContrib;
+        var ages = [ageNow];
+        var values = [capital];
+
+        for (var y = 1; y <= totalYears; y++) {
+            for (var m = 0; m < 12; m++) {
+                capital = capital * (1 + monthlyReturn) + currentContrib;
+            }
+            currentContrib *= (1 + params.contribGrowth / 100);
+            ages.push(ageNow + y);
+            values.push(capital);
+        }
+
+        return { ages: ages, values: values, fireNumber: params.fireNumber };
+    }
+
+    // === Chart ===
+    var chart = null;
+
+    function buildChart(result) {
+        var ctx = document.getElementById('growthChart').getContext('2d');
+
+        if (chart) chart.destroy();
+
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: result.ages,
+                datasets: [
+                    {
+                        label: 'Wartość portfela',
+                        data: result.values,
+                        borderColor: '#262626',
+                        backgroundColor: 'rgba(38,38,38,0.08)',
+                        fill: true,
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Twoja liczba FIRE',
+                        data: result.ages.map(function() { return result.fireNumber; }),
+                        borderColor: '#dc2626',
+                        borderWidth: 1.5,
+                        borderDash: [6, 4],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 16,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var val = context.parsed.y;
+                                if (val >= 1e6) {
+                                    return context.dataset.label + ': ' + (val / 1e6).toFixed(1) + ' mln zł';
+                                }
+                                return context.dataset.label + ': ' + Math.round(val).toLocaleString('pl-PL') + ' zł';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Wiek', font: { size: 12 } },
+                        grid: { display: false }
+                    },
+                    y: {
+                        title: { display: true, text: 'Wartość portfela (zł)', font: { size: 12 } },
+                        ticks: {
+                            callback: function(val) {
+                                if (val >= 1e6) return (val / 1e6).toFixed(1) + ' mln';
+                                if (val >= 1e3) return (val / 1e3).toFixed(0) + ' tys.';
+                                return val;
+                            }
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // === Main recalculate ===
+    var recalcTimer = null;
+    function recalculate() {
+        clearTimeout(recalcTimer);
+        recalcTimer = setTimeout(doRecalculate, 80);
+    }
+
+    function doRecalculate() {
+        var ageNow = getVal('ageNow');
+        var lifeExpectancy = getVal('lifeExpectancy');
+        var startCapital = getVal('startCapital');
+        var monthlyContrib = getVal('monthlyContrib');
+        var monthlySpend = getVal('monthlySpend');
+        var swr = getVal('swr');
+        var retNominal = getVal('retNominal');
+        var inflation = getVal('inflation');
+        var contribGrowth = getVal('contribGrowth');
+
+        // KPI
+        var fireNumber = calcFireNumber(monthlySpend, swr);
+        var yearsToFire = calcYearsToFire(startCapital, monthlyContrib, fireNumber, retNominal, inflation, contribGrowth);
+        var fireAge = ageNow + yearsToFire;
+        var totalIncome = monthlyContrib + monthlySpend;
+        var savingsRate = totalIncome > 0 ? (monthlyContrib / totalIncome) * 100 : 0;
+
+        document.getElementById('kpi-fire-number').textContent = formatPLN(fireNumber);
+        document.getElementById('kpi-years').textContent = yearsToFire === Infinity ? '∞' : yearsToFire.toFixed(1);
+        document.getElementById('kpi-age').textContent = yearsToFire === Infinity ? '-' : Math.round(fireAge).toString();
+        document.getElementById('kpi-savings-rate').textContent = savingsRate.toFixed(0);
+
+        // Chart
+        var projection = calcProjection({
+            ageNow: ageNow,
+            lifeExpectancy: lifeExpectancy,
+            startCapital: startCapital,
+            monthlyContrib: monthlyContrib,
+            retNominal: retNominal,
+            inflation: inflation,
+            contribGrowth: contribGrowth,
+            fireNumber: fireNumber
+        });
+
+        buildChart(projection);
+    }
+
+    // Run on load
+    recalculate();
+})();
+</script>
+{% endblock %}

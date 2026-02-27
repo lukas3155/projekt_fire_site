@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.config import settings
 from app.database import get_db
 from app.models.article import Article, ArticleStatus, article_tag
+from app.models.contact_message import ContactMessage
 from app.models.static_page import StaticPage
 from app.models.tag import Tag
 from app.templating import templates
@@ -87,8 +88,32 @@ async def contact_page(request: Request):
     })
 
 
+@router.get("/kalkulator-fire", response_class=HTMLResponse)
+async def calculator_fire(request: Request):
+    return templates.TemplateResponse("pages/calculator_fire.html", {
+        "request": request,
+        "active_nav": "calculator",
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": settings.SITE_URL},
+            {"name": "Kalkulator FIRE", "url": f"{settings.SITE_URL}/kalkulator-fire"},
+        ],
+    })
+
+
+@router.get("/kalkulator-procent-skladany", response_class=HTMLResponse)
+async def calculator_compound(request: Request):
+    return templates.TemplateResponse("pages/calculator_compound.html", {
+        "request": request,
+        "active_nav": "calculator",
+        "breadcrumbs_jsonld": [
+            {"name": "Strona główna", "url": settings.SITE_URL},
+            {"name": "Kalkulator procentu składanego", "url": f"{settings.SITE_URL}/kalkulator-procent-skladany"},
+        ],
+    })
+
+
 @router.post("/kontakt", response_class=HTMLResponse)
-async def contact_submit(request: Request):
+async def contact_submit(request: Request, db: AsyncSession = Depends(get_db)):
     form = await request.form()
 
     # Honeypot check
@@ -113,8 +138,12 @@ async def contact_submit(request: Request):
             "error": "Wszystkie pola są wymagane.",
         })
 
-    # Log the message (email sending will be added later)
-    logger.info(f"Contact form: name={name}, email={email}, subject={subject}")
+    client_ip = request.client.host if request.client else None
+    db.add(ContactMessage(
+        name=name, email=email, subject=subject, message=message, ip_address=client_ip,
+    ))
+    await db.commit()
+    logger.info("Contact form saved: name=%s, email=%s, subject=%s", name, email, subject)
 
     return templates.TemplateResponse("pages/contact.html", {
         "request": request,

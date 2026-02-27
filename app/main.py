@@ -7,6 +7,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
+
 from app.config import settings
 from app.database import async_session, engine
 from app.middleware import CSRFMiddleware, SecurityHeadersMiddleware
@@ -73,6 +75,7 @@ app = FastAPI(
 
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(CSRFMiddleware)
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])
 
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 

@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Column, Enum, ForeignKey, Index, Integer, String, Table, Text
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Index, Integer, String, Table, Text
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -11,6 +11,7 @@ from app.database import Base
 class ArticleStatus(str, enum.Enum):
     DRAFT = "draft"
     PUBLISHED = "published"
+    SCHEDULED = "scheduled"
 
 
 article_tag = Table(
@@ -47,6 +48,7 @@ class Article(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, onupdate=datetime.utcnow)
     published_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    scheduled_publish_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     search_vector = mapped_column(TSVECTOR, nullable=True)
 

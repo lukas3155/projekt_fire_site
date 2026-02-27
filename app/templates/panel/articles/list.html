@@ -6,7 +6,7 @@
 <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-bold text-gray-800">Artykuły</h2>
     <a href="/panel/articles/new"
-       class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium">
+       class="bg-fire-600 text-white px-4 py-2 rounded-md hover:bg-fire-700 transition-colors text-sm font-medium">
         + Nowy artykuł
     </a>
 </div>
@@ -27,26 +27,40 @@
             {% for article in articles %}
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4">
-                    <a href="/panel/articles/{{ article.id }}/edit" class="text-gray-800 hover:text-green-600 font-medium">
+                    <a href="/panel/articles/{{ article.id }}/edit" class="text-gray-800 hover:text-fire-700 font-medium">
                         {{ article.title }}
                     </a>
                     <p class="text-xs text-gray-400 mt-0.5">/{{ article.slug }}</p>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-600">
-                    {{ article.category.name if article.category else '—' }}
+                    {{ article.category.name if article.category else '-' }}
                 </td>
                 <td class="px-6 py-4">
                     <span class="text-xs px-2 py-1 rounded-full
-                        {% if article.status.value == 'published' %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                        {% if article.status.value == 'published' %}bg-fire-50 text-fire-700
+                        {% elif article.status.value == 'scheduled' %}bg-blue-100 text-blue-700
+                        {% else %}bg-yellow-100 text-yellow-700{% endif %}">
                         {{ article.status.value }}
                     </span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500">
                     {{ article.created_at.strftime('%d.%m.%Y %H:%M') }}
                 </td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-6 py-4 text-right space-x-3">
+                    <form method="post" action="/panel/articles/{{ article.id }}/toggle-status" class="inline">
+                        {{ csrf_input(request) }}
+                        {% if article.status.value == 'draft' %}
+                        <button type="submit" class="text-sm text-fire-700 hover:text-fire-900">Publikuj</button>
+                        {% elif article.status.value == 'scheduled' %}
+                        <button type="submit" class="text-sm text-yellow-600 hover:text-yellow-800"
+                                onclick="return confirm('Anulować zaplanowaną publikację?')">Anuluj</button>
+                        {% else %}
+                        <button type="submit" class="text-sm text-yellow-600 hover:text-yellow-800"
+                                onclick="return confirm('Cofnąć do szkicu?')">Cofnij</button>
+                        {% endif %}
+                    </form>
                     <a href="/panel/articles/{{ article.id }}/edit"
-                       class="text-sm text-blue-600 hover:text-blue-800 mr-3">Edytuj</a>
+                       class="text-sm text-fire-700 hover:text-fire-900">Edytuj</a>
                     <form method="post" action="/panel/articles/{{ article.id }}/delete" class="inline"
                           onsubmit="return confirm('Na pewno usunąć artykuł?')">
                         {{ csrf_input(request) }}
@@ -61,7 +75,7 @@
 {% else %}
 <div class="bg-white rounded-lg shadow-sm p-8 text-center">
     <p class="text-gray-500 mb-4">Brak artykułów.</p>
-    <a href="/panel/articles/new" class="text-green-600 hover:underline">Utwórz pierwszy artykuł</a>
+    <a href="/panel/articles/new" class="text-fire-700 hover:underline">Utwórz pierwszy artykuł</a>
 </div>
 {% endif %}
 {% endblock %}

@@ -82,6 +82,7 @@ async def create_article(
     status: ArticleStatus = ArticleStatus.DRAFT,
     meta_title: str | None = None,
     meta_description: str | None = None,
+    scheduled_publish_at: datetime | None = None,
 ) -> Article:
     slug = await _ensure_unique_slug(session, generate_slug(title))
     content_html = render_markdown(content_md)
@@ -101,6 +102,11 @@ async def create_article(
 
     if status == ArticleStatus.PUBLISHED:
         article.published_at = datetime.utcnow()
+
+    if status == ArticleStatus.SCHEDULED:
+        article.scheduled_publish_at = scheduled_publish_at
+    else:
+        article.scheduled_publish_at = None
 
     article.tags = await _resolve_tags(session, tag_ids or [])
 
@@ -123,6 +129,7 @@ async def update_article(
     status: ArticleStatus = ArticleStatus.DRAFT,
     meta_title: str | None = None,
     meta_description: str | None = None,
+    scheduled_publish_at: datetime | None = None,
 ) -> Article:
     article.title = title
     article.content_md = content_md
@@ -144,6 +151,12 @@ async def update_article(
     if status == ArticleStatus.PUBLISHED and article.published_at is None:
         article.published_at = datetime.utcnow()
 
+    # Handle scheduled_publish_at
+    if status == ArticleStatus.SCHEDULED:
+        article.scheduled_publish_at = scheduled_publish_at
+    else:
+        article.scheduled_publish_at = None
+
     article.tags = await _resolve_tags(session, tag_ids or [])
 
     await session.commit()
@@ -164,3 +177,22 @@ async def get_all_categories(session: AsyncSession) -> list[Category]:
 async def get_all_tags(session: AsyncSession) -> list[Tag]:
     result = await session.execute(select(Tag).order_by(Tag.name))
     return list(result.scalars().all())
+
+
+async def publish_scheduled_articles(session: AsyncSession) -> int:
+    """Publish articles whose scheduled_publish_at has passed. Returns count."""
+    now = datetime.utcnow()
+    result = await session.execute(
+        select(Article).where(
+            Article.status == ArticleStatus.SCHEDULED,
+            Article.scheduled_publish_at <= now,
+        )
+    )
+    articles = list(result.scalars().all())
+    for article in articles:
+        article.status = ArticleStatus.PUBLISHED
+        article.published_at = now
+        article.scheduled_publish_at = None
+    if articles:
+        await session.commit()
+    return len(articles)

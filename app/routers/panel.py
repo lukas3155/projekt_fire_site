@@ -1,3 +1,6 @@
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
 from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
@@ -7,6 +10,34 @@ from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.models.article import Article, ArticleStatus
+from app.models.contact_message import ContactMessage
+
+WARSAW_TZ = ZoneInfo("Europe/Warsaw")
+
+
+def _parse_scheduled_dt(value: str | None) -> datetime | None:
+    """Parse datetime-local input (Warsaw) to naive UTC."""
+    if not value:
+        return None
+    naive_warsaw = datetime.fromisoformat(value)
+    aware_warsaw = naive_warsaw.replace(tzinfo=WARSAW_TZ)
+    return aware_warsaw.astimezone(timezone.utc).replace(tzinfo=None)
+
+
+def _utc_to_warsaw_input(dt: datetime | None) -> str:
+    """Format naive UTC datetime for datetime-local input (Warsaw)."""
+    if not dt:
+        return ""
+    aware_utc = dt.replace(tzinfo=timezone.utc)
+    return aware_utc.astimezone(WARSAW_TZ).strftime("%Y-%m-%dT%H:%M")
+
+
+def _utc_to_warsaw_display(dt: datetime | None) -> str:
+    """Format naive UTC datetime for display (Warsaw)."""
+    if not dt:
+        return ""
+    aware_utc = dt.replace(tzinfo=timezone.utc)
+    return aware_utc.astimezone(WARSAW_TZ).strftime("%d.%m.%Y %H:%M")
 from app.models.blacklisted_word import BlacklistedWord
 from app.models.category import Category
 from app.models.comment import Comment
@@ -173,6 +204,7 @@ async def article_new(
 ):
     categories = await get_all_categories(db)
     tags = await get_all_tags(db)
+    media_list = await get_all_media(db)
     return templates.TemplateResponse("panel/articles/form.html", {
         "request": request,
         "admin": admin,
@@ -180,6 +212,9 @@ async def article_new(
         "article": None,
         "categories": categories,
         "tags": tags,
+        "media_list": media_list,
+        "scheduled_publish_at_value": "",
+        "scheduled_publish_at_display": "",
     })
 
 
@@ -193,6 +228,9 @@ async def article_create(
     tag_ids = [int(t) for t in form.getlist("tag_ids")]
     category_id = int(form.get("category_id")) if form.get("category_id") else None
 
+    status = ArticleStatus(form.get("status", "draft"))
+    scheduled_publish_at = _parse_scheduled_dt(form.get("scheduled_publish_at")) if status == ArticleStatus.SCHEDULED else None
+
     article = await create_article(
         db,
         title=form.get("title", ""),
@@ -201,9 +239,10 @@ async def article_create(
         featured_image=form.get("featured_image") or None,
         category_id=category_id,
         tag_ids=tag_ids,
-        status=ArticleStatus(form.get("status", "draft")),
+        status=status,
         meta_title=form.get("meta_title") or None,
         meta_description=form.get("meta_description") or None,
+        scheduled_publish_at=scheduled_publish_at,
     )
     return RedirectResponse(url=f"/panel/articles/{article.id}/edit?saved=1", status_code=303)
 
@@ -221,6 +260,7 @@ async def article_edit(
 
     categories = await get_all_categories(db)
     tags = await get_all_tags(db)
+    media_list = await get_all_media(db)
 
     return templates.TemplateResponse("panel/articles/form.html", {
         "request": request,
@@ -229,7 +269,10 @@ async def article_edit(
         "article": article,
         "categories": categories,
         "tags": tags,
+        "media_list": media_list,
         "flash_success": "Artykuł zapisany." if request.query_params.get("saved") else None,
+        "scheduled_publish_at_value": _utc_to_warsaw_input(article.scheduled_publish_at),
+        "scheduled_publish_at_display": _utc_to_warsaw_display(article.scheduled_publish_at),
     })
 
 
@@ -248,6 +291,9 @@ async def article_update(
     tag_ids = [int(t) for t in form.getlist("tag_ids")]
     category_id = int(form.get("category_id")) if form.get("category_id") else None
 
+    status = ArticleStatus(form.get("status", "draft"))
+    scheduled_publish_at = _parse_scheduled_dt(form.get("scheduled_publish_at")) if status == ArticleStatus.SCHEDULED else None
+
     await update_article(
         db,
         article,
@@ -257,11 +303,40 @@ async def article_update(
         featured_image=form.get("featured_image") or None,
         category_id=category_id,
         tag_ids=tag_ids,
-        status=ArticleStatus(form.get("status", "draft")),
+        status=status,
         meta_title=form.get("meta_title") or None,
         meta_description=form.get("meta_description") or None,
+        scheduled_publish_at=scheduled_publish_at,
     )
     return RedirectResponse(url=f"/panel/articles/{article_id}/edit?saved=1", status_code=303)
+
+
+@router.post("/articles/{article_id}/toggle-status")
+async def article_toggle_status(
+    request: Request,
+    article_id: int,
+    admin: dict = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    article = await get_article_by_id(db, article_id)
+    if not article:
+        return RedirectResponse(url="/panel/articles", status_code=303)
+
+    if article.status == ArticleStatus.PUBLISHED:
+        article.status = ArticleStatus.DRAFT
+    elif article.status == ArticleStatus.SCHEDULED:
+        article.status = ArticleStatus.DRAFT
+        article.scheduled_publish_at = None
+    else:
+        article.status = ArticleStatus.PUBLISHED
+        if article.published_at is None:
+            article.published_at = datetime.utcnow()
+    await db.commit()
+
+    referer = request.headers.get("referer", "")
+    if f"/articles/{article_id}/edit" in referer:
+        return RedirectResponse(url=f"/panel/articles/{article_id}/edit?saved=1", status_code=303)
+    return RedirectResponse(url="/panel/articles", status_code=303)
 
 
 @router.post("/articles/{article_id}/delete")
@@ -575,6 +650,59 @@ async def media_delete_endpoint(
 ):
     await delete_media(db, media_id)
     return RedirectResponse(url="/panel/media", status_code=303)
+
+
+# ──── Contact messages ────────────────────────────────────────────────────────
+
+
+@router.get("/messages", response_class=HTMLResponse)
+async def messages_page(
+    request: Request,
+    admin: dict = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(ContactMessage).order_by(ContactMessage.created_at.desc())
+    )
+    messages = list(result.scalars().all())
+    unread = sum(1 for m in messages if not m.is_read)
+    return templates.TemplateResponse("panel/messages.html", {
+        "request": request,
+        "admin": admin,
+        "active_page": "messages",
+        "messages": messages,
+        "unread": unread,
+    })
+
+
+@router.post("/messages/{message_id}/read")
+async def message_toggle_read(
+    request: Request,
+    message_id: int,
+    admin: dict = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(ContactMessage).where(ContactMessage.id == message_id))
+    msg = result.scalar_one_or_none()
+    if msg:
+        msg.is_read = not msg.is_read
+        await db.commit()
+    return RedirectResponse(url="/panel/messages", status_code=303)
+
+
+@router.post("/messages/{message_id}/delete")
+async def message_delete(
+    request: Request,
+    message_id: int,
+    admin: dict = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(ContactMessage).where(ContactMessage.id == message_id))
+    msg = result.scalar_one_or_none()
+    if msg:
+        await db.delete(msg)
+        await db.commit()
+    return RedirectResponse(url="/panel/messages", status_code=303)
 
 
 # ──── Static pages ────────────────────────────────────────────────────────────

@@ -27,7 +27,7 @@
                 <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Tytuł</label>
                 <input type="text" id="title" name="title" required
                        value="{{ article.title if article else '' }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent text-lg">
             </div>
 
             <!-- Content -->
@@ -40,7 +40,7 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <label for="excerpt" class="block text-sm font-medium text-gray-700 mb-1">Zajawka</label>
                 <textarea id="excerpt" name="excerpt" rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
                           placeholder="Krótki opis artykułu (wyświetlany na liście)">{{ article.excerpt if article else '' }}</textarea>
             </div>
         </div>
@@ -51,23 +51,54 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select id="status" name="status"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 mb-4">
                     <option value="draft" {% if not article or article.status.value == 'draft' %}selected{% endif %}>Szkic</option>
+                    <option value="scheduled" {% if article and article.status.value == 'scheduled' %}selected{% endif %}>Zaplanowany</option>
                     <option value="published" {% if article and article.status.value == 'published' %}selected{% endif %}>Opublikowany</option>
                 </select>
 
+                <div id="schedule-field" class="mt-4 p-4 bg-amber-50 border-2 border-amber-300 rounded-lg {% if not (article and article.status.value == 'scheduled') %}hidden{% endif %}">
+                    <label for="scheduled_publish_at" class="block text-sm font-medium text-amber-900 mb-2">Data publikacji (czas warszawski)</label>
+                    <input type="datetime-local" name="scheduled_publish_at" id="scheduled_publish_at"
+                           value="{{ scheduled_publish_at_value }}"
+                           class="w-full px-3 py-2 bg-white border-2 border-amber-400 rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    <p class="mt-2 text-xs text-amber-700">Artykul zostanie opublikowany automatycznie o wybranej godzinie.</p>
+                </div>
+
                 <button type="submit"
-                        class="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-medium">
+                        class="w-full bg-fire-600 text-white py-2 px-4 rounded-md hover:bg-fire-700 transition-colors font-medium mt-4">
                     {% if article %}Zapisz zmiany{% else %}Utwórz artykuł{% endif %}
                 </button>
+
+                {% if article %}
+                <div class="mt-3 pt-3 border-t border-gray-200">
+                    {% if article.status.value == 'draft' %}
+                    <button type="button" onclick="document.getElementById('toggle-status-form').submit()"
+                            class="w-full py-2 px-4 border border-fire-600 text-fire-700 font-medium rounded-md hover:bg-fire-600 hover:text-white transition-colors text-sm">
+                        Publikuj
+                    </button>
+                    {% elif article.status.value == 'scheduled' %}
+                    <p class="text-sm text-blue-700 mb-2">Zaplanowano: {{ scheduled_publish_at_display }}</p>
+                    <button type="button" onclick="if(confirm('Anulować zaplanowaną publikację?'))document.getElementById('toggle-status-form').submit()"
+                            class="w-full py-2 px-4 border border-yellow-500 text-yellow-700 font-medium rounded-md hover:bg-yellow-500 hover:text-white transition-colors text-sm">
+                        Anuluj planowanie
+                    </button>
+                    {% else %}
+                    <button type="button" onclick="if(confirm('Cofnąć artykuł do szkicu?'))document.getElementById('toggle-status-form').submit()"
+                            class="w-full py-2 px-4 border border-yellow-500 text-yellow-700 font-medium rounded-md hover:bg-yellow-500 hover:text-white transition-colors text-sm">
+                        Cofnij do szkicu
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <!-- Category -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Kategoria</label>
                 <select id="category_id" name="category_id"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">— Brak —</option>
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500">
+                    <option value="">- Brak -</option>
                     {% for cat in categories %}
                     <option value="{{ cat.id }}"
                         {% if article and article.category_id == cat.id %}selected{% endif %}>
@@ -85,7 +116,7 @@
                     <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                         <input type="checkbox" name="tag_ids" value="{{ tag.id }}"
                                {% if article and tag in article.tags %}checked{% endif %}
-                               class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                               class="rounded border-gray-300 text-fire-700 focus:ring-fire-500">
                         {{ tag.name }}
                     </label>
                     {% endfor %}
@@ -95,10 +126,23 @@
             <!-- Featured image -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <label for="featured_image" class="block text-sm font-medium text-gray-700 mb-1">Obrazek wyróżniający (URL)</label>
-                <input type="text" id="featured_image" name="featured_image"
-                       value="{{ article.featured_image if article and article.featured_image else '' }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                       placeholder="/static/uploads/...">
+                <div class="flex gap-2">
+                    <input type="text" id="featured_image" name="featured_image"
+                           value="{{ article.featured_image if article and article.featured_image else '' }}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent text-sm"
+                           placeholder="/static/uploads/..."
+                           oninput="updateImagePreview()">
+                    <button type="button" onclick="openMediaPicker()"
+                            class="px-3 py-2 border border-fire-600 text-fire-700 text-sm font-medium rounded-md hover:bg-fire-600 hover:text-white transition-colors whitespace-nowrap">
+                        Wybierz
+                    </button>
+                </div>
+                <div id="image-preview" class="mt-2 {% if not (article and article.featured_image) %}hidden{% endif %}">
+                    <img id="image-preview-img"
+                         src="{{ article.featured_image if article and article.featured_image else '' }}"
+                         alt="Podgląd"
+                         class="max-h-32 rounded border border-gray-200">
+                </div>
             </div>
 
             <!-- SEO -->
@@ -109,13 +153,13 @@
                         <label for="meta_title" class="block text-xs text-gray-500 mb-1">Meta title</label>
                         <input type="text" id="meta_title" name="meta_title"
                                value="{{ article.meta_title if article and article.meta_title else '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
                                placeholder="Pozostaw puste = tytuł artykułu">
                     </div>
                     <div>
                         <label for="meta_description" class="block text-xs text-gray-500 mb-1">Meta description</label>
                         <textarea id="meta_description" name="meta_description" rows="2"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent"
                                   placeholder="Pozostaw puste = zajawka">{{ article.meta_description if article and article.meta_description else '' }}</textarea>
                     </div>
                 </div>
@@ -123,11 +167,91 @@
         </div>
     </div>
 </form>
+{% if article %}
+<form id="toggle-status-form" method="post" action="/panel/articles/{{ article.id }}/toggle-status" class="hidden">
+    {{ csrf_input(request) }}
+</form>
+{% endif %}
+
+<!-- Media picker modal -->
+<div id="media-picker-overlay" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="if(event.target===this)closeMediaPicker()">
+    <div class="bg-white rounded-lg max-w-4xl max-h-[80vh] overflow-y-auto mx-auto mt-20 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-gray-800">Wybierz obrazek</h3>
+            <button type="button" onclick="closeMediaPicker()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+        </div>
+        {% if media_list %}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {% for media in media_list %}
+            <button type="button"
+                    onclick="selectMedia('/static/uploads/{{ media.filename }}')"
+                    class="group text-left border border-gray-200 rounded-lg overflow-hidden hover:ring-2 hover:ring-fire-500 transition-all">
+                <div class="aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
+                    {% if media.mime_type.startswith('image/') %}
+                    <img src="/static/uploads/{{ media.filename }}" alt="{{ media.alt_text or media.original_name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <span class="text-gray-400 text-sm">{{ media.mime_type }}</span>
+                    {% endif %}
+                </div>
+                <div class="p-2">
+                    <p class="text-xs text-gray-600 truncate">{{ media.original_name }}</p>
+                </div>
+            </button>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-sm">Brak mediów. <a href="/panel/media" class="text-fire-700 hover:text-fire-900 underline">Dodaj pliki</a></p>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 <script>
+    function openMediaPicker() {
+        document.getElementById('media-picker-overlay').classList.remove('hidden');
+    }
+
+    function closeMediaPicker() {
+        document.getElementById('media-picker-overlay').classList.add('hidden');
+    }
+
+    function selectMedia(url) {
+        document.getElementById('featured_image').value = url;
+        updateImagePreview();
+        closeMediaPicker();
+    }
+
+    function updateImagePreview() {
+        const url = document.getElementById('featured_image').value.trim();
+        const preview = document.getElementById('image-preview');
+        const img = document.getElementById('image-preview-img');
+        if (url) {
+            img.src = url;
+            preview.classList.remove('hidden');
+        } else {
+            preview.classList.add('hidden');
+            img.src = '';
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeMediaPicker();
+    });
+
+    // Toggle schedule datetime field visibility
+    const statusSelect = document.getElementById('status');
+    const scheduleField = document.getElementById('schedule-field');
+    statusSelect.addEventListener('change', function() {
+        if (this.value === 'scheduled') {
+            scheduleField.classList.remove('hidden');
+        } else {
+            scheduleField.classList.add('hidden');
+        }
+    });
+
     const easyMDE = new EasyMDE({
         element: document.getElementById('content_md'),
         spellChecker: false,

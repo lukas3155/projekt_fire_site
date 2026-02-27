@@ -52,7 +52,7 @@
     {% endblock %}
 
     {% if config.ENV == "production" and config.UMAMI_WEBSITE_ID %}
-    <script defer src="/umami/script.js" data-host-url="/umami" data-website-id="{{ config.UMAMI_WEBSITE_ID }}"></script>
+    <script defer src="https://analytics.projektfire.pl/script.js" data-website-id="{{ config.UMAMI_WEBSITE_ID }}"></script>
     {% endif %}
     {% block head %}{% endblock %}
 </head>

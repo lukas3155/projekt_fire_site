@@ -4,7 +4,7 @@ import markdown
 
 
 _md = markdown.Markdown(
-    extensions=["fenced_code", "tables", "toc", "attr_list", "nl2br"],
+    extensions=["fenced_code", "tables", "toc", "attr_list"],
     output_format="html",
 )
 

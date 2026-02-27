@@ -29,27 +29,34 @@ async def _sidebar_data(db: AsyncSession) -> dict:
 
 
 @router.get("/", response_class=HTMLResponse)
-async def homepage():
-    return RedirectResponse(url="/blog", status_code=301)
-
-
-@router.get("/blog", response_class=HTMLResponse)
-async def blog_list(
+async def homepage(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     return await _render_blog_list(request, db, page=1)
 
 
-@router.get("/blog/page/{page_num}", response_class=HTMLResponse)
+@router.get("/blog", response_class=HTMLResponse)
+async def blog_redirect():
+    return RedirectResponse(url="/", status_code=301)
+
+
+@router.get("/page/{page_num}", response_class=HTMLResponse)
 async def blog_list_paginated(
     request: Request,
     page_num: int,
     db: AsyncSession = Depends(get_db),
 ):
     if page_num <= 1:
-        return RedirectResponse(url="/blog", status_code=301)
+        return RedirectResponse(url="/", status_code=301)
     return await _render_blog_list(request, db, page=page_num)
+
+
+@router.get("/blog/page/{page_num}", response_class=HTMLResponse)
+async def blog_page_redirect(page_num: int):
+    if page_num <= 1:
+        return RedirectResponse(url="/", status_code=301)
+    return RedirectResponse(url=f"/page/{page_num}", status_code=301)
 
 
 async def _render_blog_list(request: Request, db: AsyncSession, page: int):
@@ -63,10 +70,9 @@ async def _render_blog_list(request: Request, db: AsyncSession, page: int):
         "articles": articles,
         "current_page": page,
         "total_pages": total_pages,
-        "base_url": "/blog",
+        "base_url": "",
         "breadcrumbs_jsonld": [
             {"name": "Strona główna", "url": _BASE},
-            {"name": "Blog", "url": f"{_BASE}/blog"},
         ],
         **sidebar,
     })

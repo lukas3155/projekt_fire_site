@@ -2,7 +2,7 @@
 
 {% block title %}Blog{% endblock %}
 {% block meta_description %}Artykuły o niezależności finansowej, inwestowaniu i oszczędzaniu. Poznaj drogę do FIRE.{% endblock %}
-{% block canonical %}{{ site_url }}/blog{% if current_page > 1 %}/page/{{ current_page }}{% endif %}{% endblock %}
+{% block canonical %}{{ site_url }}{% if current_page > 1 %}/page/{{ current_page }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

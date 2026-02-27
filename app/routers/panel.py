@@ -147,6 +147,7 @@ async def logout():
 
 
 @router.get("", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def dashboard(
     request: Request,
     admin: dict = Depends(require_admin),

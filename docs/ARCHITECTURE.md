@@ -205,13 +205,14 @@ projekt_fire_site/
 │ excerpt     VARCHAR  │
 │ featured_image VARCHAR│
 │ category_id FK       │
-│ status      ENUM     │  ← draft / published
+│ status      ENUM     │  ← draft / scheduled / published
 │ meta_title  VARCHAR  │
 │ meta_desc   VARCHAR  │
 │ og_image    VARCHAR  │
 │ created_at  TIMESTAMP│
 │ updated_at  TIMESTAMP│
 │ published_at TIMESTAMP│
+│ scheduled_publish_at TIMESTAMP│  ← nullable, UTC; kiedy auto-opublikowac
 │ search_vector TSVECTOR│  ← PostgreSQL full-text search
 └──────────┬───────────┘
            │
@@ -339,6 +340,7 @@ Użycie konfiguracji językowej `'polish'` zapewnia poprawne stemming polskich s
 | POST | `/panel/articles` | Zapisz nowy artykuł | `panel.py` |
 | GET | `/panel/articles/{id}/edit` | Edycja artykułu | `panel.py` |
 | PUT | `/panel/articles/{id}` | Aktualizuj artykuł | `panel.py` |
+| POST | `/panel/articles/{id}/toggle-status` | Przełącz draft/scheduled/published | `panel.py` |
 | DELETE | `/panel/articles/{id}` | Usuń artykuł | `panel.py` |
 | GET | `/panel/comments` | Komentarze do moderacji | `panel.py` |
 | DELETE | `/panel/comments/{id}` | Usuń komentarz | `panel.py` |

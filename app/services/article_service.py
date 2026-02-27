@@ -83,8 +83,10 @@ async def create_article(
     meta_title: str | None = None,
     meta_description: str | None = None,
     scheduled_publish_at: datetime | None = None,
+    custom_slug: str | None = None,
 ) -> Article:
-    slug = await _ensure_unique_slug(session, generate_slug(title))
+    raw_slug = generate_slug(custom_slug) if custom_slug else generate_slug(title)
+    slug = await _ensure_unique_slug(session, raw_slug)
     content_html = render_markdown(content_md)
 
     article = Article(
@@ -130,6 +132,7 @@ async def update_article(
     meta_title: str | None = None,
     meta_description: str | None = None,
     scheduled_publish_at: datetime | None = None,
+    custom_slug: str | None = None,
 ) -> Article:
     article.title = title
     article.content_md = content_md
@@ -142,8 +145,11 @@ async def update_article(
     article.meta_description = meta_description
     article.updated_at = datetime.utcnow()
 
-    # Update slug only if title changed
-    new_slug = generate_slug(title)
+    # Update slug if custom slug provided or title changed
+    if custom_slug:
+        new_slug = generate_slug(custom_slug)
+    else:
+        new_slug = generate_slug(title)
     if new_slug != article.slug:
         article.slug = await _ensure_unique_slug(session, new_slug, exclude_id=article.id)
 

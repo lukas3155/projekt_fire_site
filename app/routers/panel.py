@@ -244,6 +244,7 @@ async def article_create(
         meta_title=form.get("meta_title") or None,
         meta_description=form.get("meta_description") or None,
         scheduled_publish_at=scheduled_publish_at,
+        custom_slug=form.get("slug").strip() or None if form.get("slug") else None,
     )
     return RedirectResponse(url=f"/panel/articles/{article.id}/edit?saved=1", status_code=303)
 
@@ -308,6 +309,7 @@ async def article_update(
         meta_title=form.get("meta_title") or None,
         meta_description=form.get("meta_description") or None,
         scheduled_publish_at=scheduled_publish_at,
+        custom_slug=form.get("slug").strip() or None if form.get("slug") else None,
     )
     return RedirectResponse(url=f"/panel/articles/{article_id}/edit?saved=1", status_code=303)
 

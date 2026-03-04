@@ -124,6 +124,7 @@ async def _render_category(request: Request, db: AsyncSession, slug: str, page: 
     )
     articles = list((await db.execute(articles_q)).scalars().all())
     total_pages = math.ceil(total / PER_PAGE) if total > 0 else 1
+    sidebar = await _sidebar_data(db)
 
     return templates.TemplateResponse("blog/category.html", {
         "request": request,
@@ -138,6 +139,7 @@ async def _render_category(request: Request, db: AsyncSession, slug: str, page: 
             {"name": "Blog", "url": f"{_BASE}/blog"},
             {"name": category.name, "url": f"{_BASE}/kategoria/{slug}"},
         ],
+        **sidebar,
     })
 
 

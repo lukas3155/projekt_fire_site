@@ -15,23 +15,45 @@
 {% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">{{ category.name }}</h1>
-    {% if category.description %}
-    <p class="text-gray-600 mt-1">{{ category.description }}</p>
-    {% endif %}
-</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main column -->
+    <div class="lg:col-span-2">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">{{ category.name }}</h1>
+            {% if category.description %}
+            <p class="text-gray-600 mt-1">{{ category.description }}</p>
+            {% endif %}
+        </div>
 
-{% if articles %}
-<div class="space-y-6">
-    {% for article in articles %}
-        {% include "components/article_card.html" %}
-    {% endfor %}
+        {% if articles %}
+        <div class="space-y-6">
+            {% for article in articles %}
+                {% include "components/article_card.html" %}
+            {% endfor %}
+        </div>
+        {% include "components/pagination.html" with context %}
+        {% else %}
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+            <p class="text-gray-500">Brak artykułów w tej kategorii.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="space-y-6">
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Kategorie</h3>
+            <ul class="space-y-2">
+                {% for cat in sidebar_categories %}
+                <li>
+                    <a href="/kategoria/{{ cat.slug }}"
+                       class="text-sm {% if cat.slug == category.slug %}text-fire-900 font-medium{% else %}text-gray-600{% endif %} hover:text-fire-700 transition-colors">
+                        {{ cat.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
 </div>
-{% include "components/pagination.html" with context %}
-{% else %}
-<div class="bg-white rounded-lg shadow-sm p-8 text-center">
-    <p class="text-gray-500">Brak artykułów w tej kategorii.</p>
-</div>
-{% endif %}
 {% endblock %}

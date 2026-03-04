@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="/static/images/favicon.jpg">
     {% block seo %}
     <title>{% block title %}Projekt FIRE{% endblock %} | Projekt FIRE</title>
     <meta name="description" content="{% block meta_description %}Blog o niezależności finansowej, inwestowaniu i oszczędzaniu. Twoja droga do FIRE.{% endblock %}">
@@ -17,6 +18,10 @@
     <meta property="og:site_name" content="Projekt FIRE">
     <meta property="og:locale" content="pl_PL">
     {% block og_image %}{% endblock %}
+    <meta name="twitter:card" content="{% block twitter_card %}summary{% endblock %}">
+    <meta name="twitter:title" content="{{ self.title() }}">
+    <meta name="twitter:description" content="{{ self.meta_description() }}">
+    {% block twitter_image %}{% endblock %}
     {% endblock %}
 
     <script src="https://cdn.tailwindcss.com"></script>

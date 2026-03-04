@@ -7,7 +7,18 @@
 
 {% block og_image %}
 {% if article.og_image or article.featured_image %}
-<meta property="og:image" content="{{ article.og_image or article.featured_image }}">
+{% set _img = article.og_image or article.featured_image %}
+{% set _abs_img = _img if _img.startswith('http') else site_url ~ _img %}
+<meta property="og:image" content="{{ _abs_img }}">
+{% endif %}
+{% endblock %}
+
+{% block twitter_card %}summary_large_image{% endblock %}
+{% block twitter_image %}
+{% if article.og_image or article.featured_image %}
+{% set _img = article.og_image or article.featured_image %}
+{% set _abs_img = _img if _img.startswith('http') else site_url ~ _img %}
+<meta name="twitter:image" content="{{ _abs_img }}">
 {% endif %}
 {% endblock %}
 

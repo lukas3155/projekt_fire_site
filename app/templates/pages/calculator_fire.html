@@ -44,7 +44,7 @@
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-3">Kalkulator FIRE</h1>
         <p class="text-gray-600 leading-relaxed">
-            Oblicz, ile musisz zgromadzić, aby osiągnąć niezależność finansową (FIRE - Financial Independence, Retire Early).
+            Oblicz, ile musisz zgromadzić, aby osiągnąć niezależność finansową.
             Kalkulator uwzględnia inflację
         </p>
     </div>
@@ -199,7 +199,7 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Twoja liczba FIRE</p>
             <p id="kpi-fire-number" class="text-xl md:text-2xl font-bold text-fire-900">-</p>
-            <p class="text-xs text-gray-400 mt-1">zł</p>
+            <p id="kpi-fire-number-real" class="text-xs text-gray-400 mt-1">zł</p>
         </div>
         <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Lata do FIRE</p>
@@ -280,25 +280,29 @@
         return (monthlySpend * 12) / (swr / 100);
     }
 
-    function calcYearsToFire(startCapital, monthlyContrib, fireNumber, retNominal, inflation, contribGrowth) {
-        var realReturn = ((1 + retNominal / 100) / (1 + inflation / 100)) - 1;
-        var monthlyReturn = realReturn / 12;
+    function calcYearsToFire(startCapital, monthlyContrib, monthlySpend, swr, retNominal, inflation, contribGrowth) {
+        var monthlyReturn = retNominal / 100 / 12;
         var capital = startCapital;
         var months = 0;
         var maxMonths = 100 * 12;
         var currentContrib = monthlyContrib;
+        var currentAnnualSpend = monthlySpend * 12;
 
-        if (monthlyContrib <= 0 && capital < fireNumber) return Infinity;
+        if (monthlyContrib <= 0 && capital < currentAnnualSpend / (swr / 100)) return { years: Infinity, nominalFireNumber: 0 };
 
-        while (capital < fireNumber && months < maxMonths) {
+        while (months < maxMonths) {
+            var currentFireNumber = currentAnnualSpend / (swr / 100);
+            if (capital >= currentFireNumber) return { years: months / 12, nominalFireNumber: currentFireNumber };
+
             capital = capital * (1 + monthlyReturn) + currentContrib;
             months++;
             if (months % 12 === 0) {
                 currentContrib *= (1 + contribGrowth / 100);
+                currentAnnualSpend *= (1 + inflation / 100);
             }
         }
 
-        return months >= maxMonths ? Infinity : months / 12;
+        return { years: Infinity, nominalFireNumber: 0 };
     }
 
     // === Compound interest projection ===
@@ -306,24 +310,27 @@
         var ageNow = params.ageNow;
         var lifeExp = params.lifeExpectancy;
         var totalYears = lifeExp - ageNow;
-        var realReturn = ((1 + params.retNominal / 100) / (1 + params.inflation / 100)) - 1;
-        var monthlyReturn = realReturn / 12;
+        var monthlyReturn = params.retNominal / 100 / 12;
 
         var capital = params.startCapital;
         var currentContrib = params.monthlyContrib;
+        var currentAnnualSpend = params.monthlySpend * 12;
         var ages = [ageNow];
         var values = [capital];
+        var fireNumbers = [currentAnnualSpend / (params.swr / 100)];
 
         for (var y = 1; y <= totalYears; y++) {
             for (var m = 0; m < 12; m++) {
                 capital = capital * (1 + monthlyReturn) + currentContrib;
             }
             currentContrib *= (1 + params.contribGrowth / 100);
+            currentAnnualSpend *= (1 + params.inflation / 100);
             ages.push(ageNow + y);
             values.push(capital);
+            fireNumbers.push(currentAnnualSpend / (params.swr / 100));
         }
 
-        return { ages: ages, values: values, fireNumber: params.fireNumber };
+        return { ages: ages, values: values, fireNumbers: fireNumbers };
     }
 
     // === Chart ===
@@ -351,7 +358,7 @@
                     },
                     {
                         label: 'Twoja liczba FIRE',
-                        data: result.ages.map(function() { return result.fireNumber; }),
+                        data: result.fireNumbers,
                         borderColor: '#dc2626',
                         borderWidth: 1.5,
                         borderDash: [6, 4],
@@ -428,13 +435,20 @@
         var contribGrowth = getVal('contribGrowth');
 
         // KPI
-        var fireNumber = calcFireNumber(monthlySpend, swr);
-        var yearsToFire = calcYearsToFire(startCapital, monthlyContrib, fireNumber, retNominal, inflation, contribGrowth);
+        var fireNumberToday = calcFireNumber(monthlySpend, swr);
+        var fireResult = calcYearsToFire(startCapital, monthlyContrib, monthlySpend, swr, retNominal, inflation, contribGrowth);
+        var yearsToFire = fireResult.years;
         var fireAge = ageNow + yearsToFire;
         var totalIncome = monthlyContrib + monthlySpend;
         var savingsRate = totalIncome > 0 ? (monthlyContrib / totalIncome) * 100 : 0;
 
-        document.getElementById('kpi-fire-number').textContent = formatPLN(fireNumber);
+        if (yearsToFire !== Infinity && yearsToFire > 0) {
+            document.getElementById('kpi-fire-number').textContent = formatPLN(fireResult.nominalFireNumber);
+            document.getElementById('kpi-fire-number-real').textContent = 'realnie: ' + formatPLN(fireNumberToday) + ' zł';
+        } else {
+            document.getElementById('kpi-fire-number').textContent = formatPLN(fireNumberToday);
+            document.getElementById('kpi-fire-number-real').textContent = 'zł';
+        }
         document.getElementById('kpi-years').textContent = yearsToFire === Infinity ? '∞' : yearsToFire.toFixed(1);
         document.getElementById('kpi-age').textContent = yearsToFire === Infinity ? '-' : Math.round(fireAge).toString();
         document.getElementById('kpi-savings-rate').textContent = savingsRate.toFixed(0);
@@ -445,10 +459,11 @@
             lifeExpectancy: lifeExpectancy,
             startCapital: startCapital,
             monthlyContrib: monthlyContrib,
+            monthlySpend: monthlySpend,
+            swr: swr,
             retNominal: retNominal,
             inflation: inflation,
-            contribGrowth: contribGrowth,
-            fireNumber: fireNumber
+            contribGrowth: contribGrowth
         });
 
         buildChart(projection);
